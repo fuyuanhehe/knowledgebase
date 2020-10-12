@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.eval.mapper.IExamMapper" >
+    <!--  结果考试扩展map -->
+    <resultMap type="ExamVO" id="examVOMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="test_paper_id" property="testPaperId"/>
+        <result column="test_paper_name" property="testPaperName"/>
+        <result column="status" property="status"/>
+        <result column="begin_time" property="beginTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="answer_time" property="answerTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="test_paper_subjects" property="testPaperSubjects"/>
+        <result column="total_subject_count" property="totalSubjectCount"/>
+        <result column="total_score" property="totalScore"/>
+        <result column="user_count" property="userCount"/>
+        <result column="average_score" property="averageScore"/>
+        <result column="max_score" property="maxScore"/>
+        <result column="min_score" property="minScore"/>
+        <result column="sum_score" property="sumScore"/>
+    </resultMap>
+    
+    <!--  结果考试扩展map -->
+    <resultMap type="ExamVO" id="examVOMap2">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="test_paper_id" property="testPaperId"/>
+        <result column="test_paper_name" property="testPaperName"/>
+        <result column="status" property="status"/>
+        <result column="begin_time" property="beginTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="answer_time" property="answerTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="test_paper_subjects" property="testPaperSubjects"/>
+        <collection property="users" column="id" javaType="java.util.Set" select="selectUserExamByExamId"></collection>
+    </resultMap>
+    
+    <!--  结果基础考试扩展map -->
+    <resultMap type="Exam" id="examMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+    
+    <!-- 结果用户考试map -->
+    <resultMap type="UserExamVO" id="userExamVOMap">
+        <result column="user_id" property="userId"/>
+        <result column="exam_id" property="examId"/>
+        <result column="exam_name" property="examName"/>
+        <result column="submit_paper_time" property="submitPaperTime"/>
+        <result column="answers" property="answers"/>
+        <result column="score" property="score"/>
+        <result column="status" property="status"/>
+        <result column="examed_count" property="examedCount"/>
+        <result column="create_time" property="createTime"/>
+        <result column="submit_time" property="submitTime"/>
+        <result column="total_score" property="totalScore"/>
+        <result column="total_num" property="totalNum"/>
+        <result column="exam_end_time" property="examEndTime"/>
+        <result column="test_paper_id" property="testPaperId"/>
+        <result column="error_num" property="errorNum"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="user_name" property="userName"/>
+        <result column="subjects" property="subjects"/>
+    </resultMap>
+    
+    <!-- 插入考试 -->
+    <insert id="insertExam" parameterType="Exam">
+        INSERT INTO base_exam
+        ( name, id, test_paper_id, begin_time, end_time,answer_time, status, create_user)
+        VALUES
+        ( #{name}, #{id}, #{testPaperId}, #{beginTime}, #{endTime}, #{answerTime}, #{status}, #{createUser})
+    </insert>
+    
+    <!-- 批量插入考试 -->
+    <insert id="insertBatchExam" parameterType="java.util.List">
+        INSERT INTO base_exam
+        ( name, id, test_paper_id, begin_time, end_time, answer_time, status, create_user)
+        VALUES
+        <foreach collection="exams" item="exam" separator="," close=";">
+	        ( #{exam.name}, #{exam.id}, #{exam.testPaperId}, #{exam.beginTime}, 
+	        #{exam.endTime}, #{exam.answerTime}, #{exam.status}, #{exam.createUser})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除考试 -->
+    <delete id="deleteExamById" parameterType="String">
+        DELETE 
+		FROM
+		    base_exam 
+		WHERE
+		    id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除考试 -->
+    <delete id="deleteBatchExamById" parameterType="java.util.Set">
+        DELETE 
+        FROM
+            base_exam 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改考试 -->
+    <update id="updateExam" parameterType="Exam">
+        UPDATE base_exam 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="testPaperId != null">
+                test_paper_id = #{testPaperId},
+            </if>
+            <if test="beginTime != null">
+                begin_time = #{beginTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="answerTime != null">
+                answer_time = #{answerTime},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+		WHERE
+		    id = #{id}
+    </update>
+    
+    <!-- 根据id查询考试 -->
+    <select id="selectExamById" parameterType="String" resultMap="examVOMap2">
+        SELECT
+            be.id,
+            be.name,
+            be.test_paper_id,
+            be.begin_time,
+            be.end_time,
+            be.answer_time,
+            be.status,
+            btp.name AS test_paper_name,
+            btp.subjects AS test_paper_subjects
+        FROM
+            base_exam AS be
+            JOIN base_test_paper AS btp ON btp.id = be.test_paper_id
+        WHERE
+            be.id = #{id}
+    </select>
+    
+    <!-- 根据标题名查询考试 -->
+    <select id="selectExamByName" parameterType="String" resultMap="examMap">
+        SELECT
+            id
+        FROM
+            base_exam
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有考试 -->
+    <select id="selectExamList" parameterType="Exam" resultMap="examVOMap">
+        SELECT
+            be.id,
+            be.name,
+            be.test_paper_id,
+            be.begin_time,
+            be.end_time,
+            be.status,
+            be.create_time
+        FROM
+            base_exam AS be
+            JOIN base_test_paper AS btp ON btp.id = be.test_paper_id
+        <where>
+            <if test="status != null">
+                AND be.status = #{status}
+            </if>
+            <if test="name != null and name != ''">
+                AND be.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND be.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY be.create_time DESC
+    </select>
+    
+    <!-- 查询所有基础考试 -->
+    <select id="selectBaseExamList" parameterType="Exam" resultMap="examMap">
+        SELECT
+            id,
+            NAME
+        FROM
+            base_exam
+        <where>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!--  查询考试总数量 -->
+    <select id="selectExamCount" resultType="int" parameterType="Exam">
+        SELECT
+            COUNT(id)
+        FROM
+            base_exam
+        <where>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="testPaperId != null and testPaperId != ''">
+                AND test_paper_id = #{testPaperId}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+    </select>
+    
+    <!-- 查询考试统计信息 -->
+    <select id="selectExamCountMsg" resultMap="examVOMap" parameterType="String">
+        SELECT
+            be.id,
+            be."name",
+            be.answer_time,
+            be.begin_time,
+            be.end_time,
+            btp.total_num AS total_subject_count,
+            btp.total_score,
+        CASE
+            WHEN bume.count IS NULL THEN
+            0 ELSE bume.count 
+            END AS user_count,
+            bume.max AS max_score,
+            bume.min AS min_score,
+            bume.count AS sum_score
+        FROM
+            base_exam AS be
+            JOIN base_test_paper AS btp ON btp.id = be.test_paper_id
+            LEFT JOIN ( SELECT exam_id,count( exam_id ), max( score ), min( score ), sum(score) FROM bus_user_map_exam GROUP BY exam_id ) AS bume ON be.id = bume.exam_id 
+        WHERE
+        be.id = #{id}
+    </select>
+    <!-- #########################用户考试关系 #############################-->
+    <!-- 插入用户考试 -->
+    <insert id="insertUserExam">
+        INSERT INTO bus_user_map_exam
+        (user_id, exam_id )
+        VALUES
+        <foreach collection="userIds" item="userId" separator=",">
+            (#{userId}, #{examId} )
+        </foreach>
+    </insert>
+    
+    <!-- 删除用户考试 -->
+    <delete id="deleteUserExam" parameterType="UserExam">
+        DELETE 
+        FROM
+            bus_user_map_exam 
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="examId != null">
+                AND exam_id = #{examId}
+            </if>
+        </where>
+    </delete>
+    
+    <!-- 根据考试id批量删除用户考试 -->
+    <delete id="deleteBatchUserExamByExamId" parameterType="java.util.List">
+        DELETE 
+        FROM
+            bus_user_map_exam 
+        <where>
+                <foreach collection="examIds" item="examId" separator="or">
+                    exam_id = #{examId}
+                </foreach>
+        </where>
+    </delete>
+    
+    <!-- 根据用户id批量删除用户考试 -->
+    <delete id="deleteBatchUserExamByUserId" parameterType="java.util.List">
+        DELETE 
+        FROM
+            bus_user_map_exam 
+        <where>
+                <foreach collection="userIds" item="userId" separator="or">
+                    user_id = #{userId}
+                </foreach>
+        </where>
+    </delete>
+    
+    <!--  修改用户考试 -->
+    <update id="updateUserExam" parameterType="UserExam">
+        UPDATE bus_user_map_exam 
+        SET 
+	        submit_paper_time = #{submitPaperTime}, answers = #{answers}::jsonb, score = #{score},
+	        error_num = #{errorNum}, status = #{status}, submit_time = #{submitTime}
+        WHERE
+            user_id = #{userId} AND exam_id = #{examId}
+    </update>
+    
+    <!--  获取用户考试列表 -->
+    <select id="selectUserExamList" parameterType="UserExamVO" resultMap="userExamVOMap">
+        SELECT
+            be.test_paper_id,
+            be.NAME AS exam_name,
+            sd.name AS dept_name,
+            su.nick_name AS user_name,
+            be.end_time AS exam_end_time,
+            bume.user_id,
+            bume.exam_id,
+            bume.score,
+            bume.STATUS,
+            bume.error_num,
+            bume.submit_time,
+            bume.submit_paper_time,
+            bume.create_time,
+            bume2.count AS examed_count
+        FROM
+            bus_user_map_exam AS bume
+            JOIN sys_user AS su ON su.id = bume.user_id
+            JOIN base_exam AS be ON be.ID = bume.exam_id
+            LEFT JOIN sys_dept AS sd ON sd.id = su.dept_id
+            LEFT JOIN ( SELECT exam_id, COUNT( exam_id ) FROM bus_user_map_exam WHERE STATUS = 1 GROUP BY exam_id ) bume2
+             ON bume.exam_id = bume2.exam_id
+        <where>
+            <if test="userName != null and userName != ''">
+                AND su.NAME = #{userName}
+            </if>
+            <if test="status != null">
+                AND bume.status = #{status}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND bume.user_id = #{userId}
+            </if>
+            <if test="examId != null and examId != ''">
+                AND bume.exam_id = #{examId}
+            </if>
+        </where>
+        ORDER BY 
+        <choose>
+            <when test="orderBy == 'createTime'">
+                bume.create_time DESC
+            </when>
+            <when test="orderBy == 'submitTime'">
+                 bume.submit_time DESC
+            </when>
+            <otherwise>
+                bume.create_time DESC
+            </otherwise>
+        </choose>
+    </select>
+    
+    <!--  获取用户考试 -->
+    <select id="selectUserExam" parameterType="String" resultMap="userExamVOMap">
+        SELECT
+            bume.user_id,
+            bume.exam_id,
+            bume.score,
+            bume.answers,
+            bume.status,
+            bume.submit_paper_time,
+            su.nick_name AS user_name,
+            be.NAME AS exam_name,
+            be.end_time AS exam_end_time,
+            btp.total_score,
+            btp.total_num,
+            btp.subjects
+        FROM
+            bus_user_map_exam AS bume
+            JOIN sys_user AS su ON su.id = bume.user_id
+            JOIN base_exam AS be ON be.ID = bume.exam_id
+            JOIN base_test_paper AS btp ON btp.ID = be.test_paper_id
+        WHERE
+            bume.user_id = #{userId} AND bume.exam_id = #{examId}
+    </select>
+    
+    <!-- 根据考试id查询用户考试列表 -->
+    <select id="selectUserExamByExamId" resultType="String" parameterType="String">
+        SELECT
+            user_id 
+        FROM
+            bus_user_map_exam 
+        WHERE
+            exam_id = #{id}
+    </select>
+    
+    <!-- 查询用户考试信息统计列表 -->
+    <select id="selectUserExamStatList" resultType="com.hg.knowledgebase.module.stat.bean.StatisticsCondition" parameterType="com.hg.knowledgebase.module.stat.bean.StatisticsCondition">
+        SELECT
+            <choose>
+                <!-- 年统计 -->
+                <when test="type == 'year'">
+                    to_char ( bume.submit_time, 'YYYY' ) AS data,
+                </when>
+                <!-- 月、半年、季度统计 -->
+                <when test="type == 'month' or type == 'half_year' or type == 'quarter'">
+                    to_char ( bume.submit_time, 'YYYY-MM' ) AS data, 
+                </when>
+                <!-- 日、周统计 -->
+                <when test="type == 'day' or type == 'week'">
+                    to_char ( bume.submit_time, 'YYYY-MM-DD' ) AS data,
+                </when>
+                <!-- 自定义统计 -->
+                <when test="type == 'custom'">
+                    <choose>
+                        <when test="customType == 1">
+                            to_char ( bume.submit_time, 'YYYY' ) AS data,
+                        </when>
+                        <when test="customType == 2">
+                            to_char ( bume.submit_time, 'YYYY-MM' ) AS data,
+                        </when>
+                        <when test="customType == 3">
+                            to_char ( bume.submit_time, 'YYYY-MM-DD' ) AS data,
+                        </when>
+                    </choose>
+                </when>
+            </choose>
+            count( 1 ) AS count
+        FROM
+            bus_user_map_exam AS bume
+            JOIN sys_user AS su ON su.id = bume.user_id 
+        <where>
+            <if test="otherCondition != null">
+                <if test="otherCondition.containsKey('userId') and otherCondition.userId != null and otherCondition.userId != ''">
+                    AND su.id = #{otherCondition.userId}
+                </if>
+                <if test="otherCondition.containsKey('deptId') and otherCondition.deptId != null and otherCondition.deptId != ''">
+                    AND su.dept_id = #{otherCondition.deptId}
+                </if>
+                <if test="otherCondition.containsKey('examStatus') and otherCondition.examStatus != null and otherCondition.examStatus != ''">
+                    AND bume.status = #{otherCondition.examStatus}
+                </if>
+            </if>
+            <choose>
+                <!-- 年统计 -->
+                <when test="type == 'year'">
+                    AND to_char(bume.submit_time, 'YYYY') BETWEEN #{beginTime} AND #{endTime}
+                </when>
+                <!-- 月、半年、季度统计 -->
+                <when test="type == 'month' or type == 'half_year' or type == 'quarter'">
+                    AND to_char(bume.submit_time, 'YYYY-MM') BETWEEN #{beginTime} AND #{endTime}
+                </when>
+                <!-- 日、周统计 -->
+                <when test="type == 'day' or type == 'week'">
+                    AND to_char(bume.submit_time, 'YYYY-MM-DD') BETWEEN #{beginTime} AND #{endTime}
+                </when>
+                <!-- 自定义统计 -->
+                <when test="type == 'custom'">
+                    <choose>
+                        <when test="customType == 1">
+                            AND to_char(bume.submit_time, 'YYYY') BETWEEN #{beginTime} AND #{endTime}
+                        </when>
+                        <when test="customType == 2">
+                            AND to_char(bume.submit_time, 'YYYY-MM') BETWEEN #{beginTime} AND #{endTime}
+                        </when>
+                        <when test="customType == 3">
+                            AND to_char(bume.submit_time, 'YYYY-MM-DD') BETWEEN #{beginTime} AND #{endTime}
+                        </when>
+                    </choose>
+                </when>
+            </choose>
+        </where>
+        GROUP BY
+            bume.submit_time
+    </select>
+</mapper>

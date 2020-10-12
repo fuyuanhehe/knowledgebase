@@ -1,0 +1,40 @@
+.display_ib {
+  display: inline-block !important;
+}
+.display_b {
+  display: block !important;
+}
+.cursor_p {
+  cursor: pointer;
+}
+.text_l {
+  text-align: left;
+}
+.text_c {
+  text-align: center;
+}
+.text_r {
+  text-align: right;
+}
+.text_j {
+  text-align: justify;
+}
+.wspace_n {
+  white-space: nowrap;
+}
+
+.hidden {
+  opacity: 0;
+  overflow: hidden;
+  width: 0;
+  height: 0;
+}
+.va_m {
+  vertical-align: middle;
+}
+.va_t {
+  vertical-align: top;
+}
+.va_b {
+  vertical-align: bottom;
+}

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.sys.mapper.IPowerMapper" >
+    <!--  结果权限扩展map -->
+    <resultMap type="PowerVO" id="powerMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="coder" property="coder"/>
+        <result column="menu_id" property="menu_id"/>
+        <result column="menu_name" property="menuName"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!--  结果基础权限扩展map -->
+    <resultMap type="Power" id="basePowerMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+    
+    <!-- 插入权限 -->
+    <insert id="insertPower" parameterType="Power">
+        INSERT INTO sys_power
+        ( name, id, coder, menu_id, create_user)
+        VALUES
+        ( #{name}, #{id}, #{coder}, #{menuId}, #{createUser})
+    </insert>
+    
+    <!-- 批量插入权限 -->
+    <insert id="insertBatchPower" parameterType="java.util.List">
+        INSERT INTO sys_power
+        ( name, id, coder, menu_id,create_user)
+        VALUES
+        <foreach collection="powers" item="power" separator="," close=";">
+            ( #{power.name}, #{power.id}, #{power.coder}, #{power.menuId},#{power.createUser})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除权限 -->
+    <delete id="deletePowerById" parameterType="String">
+        DELETE 
+        FROM
+            sys_power 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除权限 -->
+    <delete id="deleteBatchPowerById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            sys_power 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改权限 -->
+    <update id="updatePower" parameterType="Power">
+        UPDATE sys_power 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="coder != null">
+                coder = #{coder},
+            </if>
+            <if test="menuId != null">
+                menu_id = #{menuId},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 根据id查询权限 -->
+    <select id="selectPowerById" parameterType="String" resultMap="powerMap">
+        SELECT
+            sp.id,
+            sp.name,
+            sp.coder,
+            sp.menu_id,
+            sm.name AS menu_name
+        FROM
+            sys_power AS sp
+        LEFT JOIN sys_menu AS sm ON sp.menu_id = sm.id
+        WHERE
+            id = #{id}
+    </select>
+    
+    <!-- 根据权限名查询权限 -->
+    <select id="selectPowerByName" parameterType="String" resultMap="powerMap">
+        SELECT
+            id
+        FROM
+            sys_power
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有权限 -->
+    <select id="selectPowerList" parameterType="Power" resultMap="powerMap">
+        SELECT
+            sp.id,
+            sp.NAME,
+            sp.coder,
+            sp.menu_id,
+            sm.name AS menu_name
+        FROM
+            sys_power AS sp
+            LEFT JOIN sys_menu AS sm ON sp.menu_id = sm.id
+        <where>
+            <if test="menuId != null and menuId != ''">
+                AND sp.menu_id = #{menuId}
+            </if>
+            <if test="name != null and name != ''">
+                AND sp.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND sp.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY sp.create_time DESC
+    </select>
+    
+    <!-- 查询基础权限列表 -->
+    <select id="selectBasePowerList" parameterType="Power" resultMap="basePowerMap">
+        SELECT
+            id,
+            NAME
+        FROM
+            sys_power
+        <where>
+            <if test="menuId != null and menuId != ''">
+                AND menu_id = #{menuId}
+            </if>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- 查询基础权限列表 -->
+    <select id="selectUserPowerList" parameterType="String" resultType="String">
+        SELECT
+            sp.coder
+        FROM
+            sys_power AS sp
+            JOIN sys_role_map_power AS srmp ON sp.ID = srmp.power_id
+            JOIN sys_user AS su ON srmp.role_id = su.role_id 
+        WHERE
+            su.NAME = #{userName}
+    </select>
+</mapper>

@@ -1,0 +1,677 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.repo.mapper.BaseDocumentMapper" >
+
+    <resultMap id="BaseResultMap" type="com.hg.knowledgebase.module.repo.entity.BaseDocument" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="SMALLINT" />
+        <result column="size" property="size" jdbcType="NUMERIC" />
+        <result column="suffix" property="suffix" jdbcType="VARCHAR" />
+        <result column="pid" property="pid" jdbcType="VARCHAR" />
+        <result column="weight" property="weight" jdbcType="SMALLINT" />
+        <result column="url" property="url" jdbcType="VARCHAR" />
+        <result column="category_id" property="categoryId" jdbcType="VARCHAR" />
+        <result column="dept_id" property="deptId" jdbcType="VARCHAR" />
+        <result column="cover_url" property="coverUrl" jdbcType="VARCHAR" />
+        <result column="cover_size" property="coverSize" jdbcType="NUMERIC" />
+        <result column="browse_num" property="browseNum"  />
+        <result column="comment_num" property="commentNum"  />
+        <result column="download_num" property="downloadNum"  />
+        <result column="udpate_num" property="udpateNum"  />
+        <result column="print_num" property="printNum"  />
+        <result column="correction_num" property="correctionNum" />
+        <result column="reserve1" property="reserve1" jdbcType="VARCHAR" />
+        <result column="reserve2" property="reserve2" jdbcType="VARCHAR" />
+        <result column="reserve3" property="reserve3" jdbcType="VARCHAR" />
+        <result column="reserve4" property="reserve4" jdbcType="VARCHAR" />
+        <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+        <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime"  />
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+        <result column="update_time" property="updateTime"  />
+    </resultMap>
+
+    <resultMap id="BaseResultMaps" type="com.hg.knowledgebase.module.repo.entity.VO.BaseDocumentVO" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="SMALLINT" />
+        <result column="size" property="size" jdbcType="NUMERIC" />
+        <result column="suffix" property="suffix" jdbcType="VARCHAR" />
+        <result column="pid" property="pid" jdbcType="VARCHAR" />
+        <result column="weight" property="weight" jdbcType="SMALLINT" />
+        <result column="url" property="url" jdbcType="VARCHAR" />
+        <result column="category_id" property="categoryId" jdbcType="VARCHAR" />
+        <result column="dept_id" property="deptId" jdbcType="VARCHAR" />
+        <result column="cover_url" property="coverUrl" jdbcType="VARCHAR" />
+        <result column="cover_size" property="coverSize" jdbcType="NUMERIC" />
+        <result column="browse_num" property="browseNum"  />
+        <result column="comment_num" property="commentNum"  />
+        <result column="download_num" property="downloadNum"  />
+        <result column="udpate_num" property="udpateNum"  />
+        <result column="print_num" property="printNum"  />
+        <result column="correction_num" property="correctionNum" />
+        <result column="reserve1" property="reserve1" jdbcType="VARCHAR" />
+        <result column="reserve2" property="reserve2" jdbcType="VARCHAR" />
+        <result column="reserve3" property="reserve3" jdbcType="VARCHAR" />
+        <result column="reserve4" property="reserve4" jdbcType="VARCHAR" />
+        <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+        <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime"  />
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+        <result column="update_time" property="updateTime"  />
+        <result column="categoryName" property="categoryName"  />
+    </resultMap>
+
+
+    <sql id="Base_Column_List" >
+        id, name, type, size, suffix, pid, weight, url, category_id, dept_id, cover_url,
+        cover_size, browse_num, comment_num, download_num, udpate_num, print_num, correction_num,
+        reserve1, reserve2, reserve3, reserve4, project_id, create_user, create_time, update_user,
+        update_time
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMaps" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from base_document
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+        delete from base_document
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+
+
+    <insert id="insertSelective" parameterType="com.hg.knowledgebase.module.repo.entity.BaseDocument" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+        insert into base_document
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="name != null" >
+                name,
+            </if>
+            <if test="type != null" >
+                type,
+            </if>
+            <if test="size != null" >
+                size,
+            </if>
+            <if test="suffix != null" >
+                suffix,
+            </if>
+            <if test="pid != null" >
+                pid,
+            </if>
+            <if test="weight != null" >
+                weight,
+            </if>
+            <if test="url != null" >
+                url,
+            </if>
+            <if test="categoryId != null" >
+                category_id,
+            </if>
+            <if test="deptId != null" >
+                dept_id,
+            </if>
+            <if test="coverUrl != null" >
+                cover_url,
+            </if>
+            <if test="coverSize != null" >
+                cover_size,
+            </if>
+            <if test="browseNum != null" >
+                browse_num,
+            </if>
+            <if test="commentNum != null" >
+                comment_num,
+            </if>
+            <if test="downloadNum != null" >
+                download_num,
+            </if>
+            <if test="udpateNum != null" >
+                udpate_num,
+            </if>
+            <if test="printNum != null" >
+                print_num,
+            </if>
+            <if test="correctionNum != null" >
+                correction_num,
+            </if>
+            <if test="reserve1 != null" >
+                reserve1,
+            </if>
+            <if test="reserve2 != null" >
+                reserve2,
+            </if>
+            <if test="reserve3 != null" >
+                reserve3,
+            </if>
+            <if test="reserve4 != null" >
+                reserve4,
+            </if>
+            <if test="projectId != null" >
+                project_id,
+            </if>
+            <if test="createUser != null" >
+                create_user,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="updateUser != null" >
+                update_user,
+            </if>
+            <if test="updateTime != null" >
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null" >
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null" >
+                #{type,jdbcType=SMALLINT},
+            </if>
+            <if test="size != null" >
+                #{size,jdbcType=NUMERIC},
+            </if>
+            <if test="suffix != null" >
+                #{suffix,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null" >
+                #{pid,jdbcType=VARCHAR},
+            </if>
+            <if test="weight != null" >
+                #{weight,jdbcType=SMALLINT},
+            </if>
+            <if test="url != null" >
+                #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="categoryId != null" >
+                #{categoryId,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null" >
+                #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="coverUrl != null" >
+                #{coverUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="coverSize != null" >
+                #{coverSize,jdbcType=NUMERIC},
+            </if>
+            <if test="browseNum != null" >
+                #{browseNum },
+            </if>
+            <if test="commentNum != null" >
+                #{commentNum },
+            </if>
+            <if test="downloadNum != null" >
+                #{downloadNum },
+            </if>
+            <if test="udpateNum != null" >
+                #{udpateNum },
+            </if>
+            <if test="printNum != null" >
+                #{printNum },
+            </if>
+            <if test="correctionNum != null" >
+                #{correctionNum },
+            </if>
+            <if test="reserve1 != null" >
+                #{reserve1,jdbcType=VARCHAR},
+            </if>
+            <if test="reserve2 != null" >
+                #{reserve2,jdbcType=VARCHAR},
+            </if>
+            <if test="reserve3 != null" >
+                #{reserve3,jdbcType=VARCHAR},
+            </if>
+            <if test="reserve4 != null" >
+                #{reserve4,jdbcType=VARCHAR},
+            </if>
+            <if test="projectId != null" >
+                #{projectId,jdbcType=VARCHAR},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.hg.knowledgebase.module.repo.entity.BaseDocument" >
+        update base_document
+        <set >
+            <if test="name != null" >
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null" >
+                type = #{type,jdbcType=SMALLINT},
+            </if>
+            <if test="size != null" >
+                size = #{size,jdbcType=NUMERIC},
+            </if>
+            <if test="suffix != null" >
+                suffix = #{suffix,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null" >
+                pid = #{pid,jdbcType=VARCHAR},
+            </if>
+            <if test="weight != null" >
+                weight = #{weight,jdbcType=SMALLINT},
+            </if>
+            <if test="url != null" >
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="categoryId != null" >
+                category_id = #{categoryId,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null" >
+                dept_id = #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="coverUrl != null" >
+                cover_url = #{coverUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="coverSize != null" >
+                cover_size = #{coverSize,jdbcType=NUMERIC},
+            </if>
+            <if test="browseNum != null" >
+                browse_num = #{browseNum },
+            </if>
+            <if test="commentNum != null" >
+                comment_num = #{commentNum },
+            </if>
+            <if test="downloadNum != null" >
+                download_num = #{downloadNum },
+            </if>
+            <if test="udpateNum != null" >
+                udpate_num = #{udpateNum },
+            </if>
+            <if test="printNum != null" >
+                print_num = #{printNum },
+            </if>
+            <if test="correctionNum != null" >
+                correction_num = #{correctionNum },
+            </if>
+            <if test="reserve1 != null" >
+                reserve1 = #{reserve1,jdbcType=VARCHAR},
+            </if>
+            <if test="reserve2 != null" >
+                reserve2 = #{reserve2,jdbcType=VARCHAR},
+            </if>
+            <if test="reserve3 != null" >
+                reserve3 = #{reserve3,jdbcType=VARCHAR},
+            </if>
+            <if test="reserve4 != null" >
+                reserve4 = #{reserve4,jdbcType=VARCHAR},
+            </if>
+            <if test="projectId != null" >
+                project_id = #{projectId,jdbcType=VARCHAR},
+            </if>
+            <if test="createUser != null" >
+                create_user = #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                update_user = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <!--文档管理分页-->
+    <select id="selectBaseDocumentPage" parameterType="com.hg.knowledgebase.module.repo.entity.BaseDocument"
+    resultMap="BaseResultMap">
+    select
+        b.id, b.name, b.type, b.size, b.suffix, b.pid, b.weight, b.url, b.category_id, b.dept_id, b.cover_url,
+        b.cover_size, b.browse_num, b.comment_num, b.download_num, b.udpate_num, b.print_num, b.correction_num,
+         b.reserve2, b.reserve3, b.project_id, b.create_user, b.create_time, b.update_user,
+        b.update_time,
+        count( b2.id ) as reserve1,
+       bc.name as reserve4
+    from  base_document b
+
+        LEFT JOIN ( SELECT * FROM base_document ) AS b2 ON b.id = b2.pid
+        left join base_document_category bc on  b.category_id = bc.id
+
+        <where>
+            <if test="name != null and name != '' " >
+                AND b.name LIKE CONCAT('%',#{name},'%')
+            </if>
+
+            <if test="createUser != null and createUser != ''" >
+                AND b.create_user LIKE CONCAT('%',#{createUser},'%')
+            </if>
+
+            <if test="reserve3 != null and reserve3 != '' " >
+                AND  b.reserve3 = #{reserve3}
+            </if>
+            <if test="projectId != null and projectId != '' " >
+                AND  b.project_id = #{projectId}
+            </if>
+
+            <if test="type != null" >
+                AND  b.type = #{type,jdbcType=SMALLINT}
+            </if>
+            <if test="size != null" >
+                AND b.size = #{size,jdbcType=NUMERIC}
+            </if>
+            <if test="suffix != null" >
+                AND  b.suffix = #{suffix,jdbcType=VARCHAR}
+            </if>
+            <if test="pid != null" >
+                AND  b.pid = #{pid,jdbcType=VARCHAR}
+            </if>
+            <if test="weight != null" >
+                AND   b.weight = #{weight,jdbcType=SMALLINT}
+            </if>
+            <if test="url != null and url != ''" >
+                AND  b.url = #{url,jdbcType=VARCHAR}
+            </if>
+            <if test="categoryId != null" >
+                AND   b.category_id = #{categoryId,jdbcType=VARCHAR}
+            </if>
+            <if test="deptId != null" >
+                AND b.dept_id = #{deptId,jdbcType=VARCHAR}
+            </if>
+            <if test="coverUrl != null" >
+                AND  b.cover_url = #{coverUrl,jdbcType=VARCHAR}
+            </if>
+            <if test="coverSize != null" >
+                AND  b.cover_size = #{coverSize,jdbcType=NUMERIC}
+            </if>
+            <if test="browseNum != null" >
+                AND b.browse_num = #{browseNum }
+            </if>
+            <if test="commentNum != null" >
+                AND b.comment_num = #{commentNum }
+            </if>
+            <if test="downloadNum != null" >
+                AND b.download_num = #{downloadNum }
+            </if>
+            <if test="udpateNum != null" >
+                AND b.udpate_num = #{udpateNum }
+            </if>
+            <if test="printNum != null" >
+                AND  b.print_num = #{printNum }
+            </if>
+            <if test="correctionNum != null" >
+                AND b.correction_num = #{correctionNum }
+            </if>
+            <if test="reserve2 != null" >
+                AND b.pid = '0'
+            </if>
+            <if test="id != null" >
+                AND b.id = #{id}
+            </if>
+
+        </where>
+        GROUP BY
+        b.id,bc.id
+     order by b.create_time desc
+
+    </select>
+
+
+    <select id="getTreeBaseDocument" parameterType="com.hg.knowledgebase.module.repo.entity.BaseDocument"
+            resultMap="BaseResultMap">
+    select    <include refid="Base_Column_List" /> from  base_document
+        where id = #{id} and pid = #{id}
+
+        create_time desc
+     </select>
+
+<!--批量删除-->
+    <delete id="delBaseDocumentList" parameterType="java.util.List">
+         delete from base_document where id in
+          <foreach collection="list" item="id" open="(" separator="," close=")">
+                   #{id}
+          </foreach>
+
+
+    </delete>
+
+    <!--查询文档名称-->
+   <select id="getName" resultType="java.lang.String">
+    select name from       base_document
+    where name like '新建文件夹%' and name != '新建文件夹'
+   </select>
+     <!--查询url-->
+    <select id="getFileUrl" resultType="com.hg.knowledgebase.module.repo.entity.BaseDocument" parameterType="java.util.List">
+        select id,url,type from     base_document where pid in
+
+           <foreach collection="ids" item="id" open="(" separator="," close=")">
+                 #{id}
+
+           </foreach>
+
+    </select>
+
+    <!--添加多个文档-->
+    <insert id="addMultiBaseDocument" parameterType="java.util.List">
+     insert into   base_document (id, name, type,
+        size, suffix, pid,
+        weight, url, category_id,
+        dept_id, cover_url, cover_size,
+        browse_num, comment_num, download_num,
+        udpate_num, print_num, correction_num,
+        reserve1, reserve2, reserve3,
+        reserve4, project_id, create_user,
+        create_time, update_user, update_time
+        )  values
+     <foreach collection="list" item="mo" separator=",">
+         (
+
+          #{mo.id,jdbcType=VARCHAR}, #{mo.name,jdbcType=VARCHAR}, #{mo.type,jdbcType=SMALLINT},
+         #{mo.size,jdbcType=NUMERIC}, #{mo.suffix,jdbcType=VARCHAR}, #{mo.pid,jdbcType=VARCHAR},
+         #{mo.weight,jdbcType=SMALLINT}, #{mo.url,jdbcType=VARCHAR}, #{mo.categoryId,jdbcType=VARCHAR},
+         #{mo.deptId,jdbcType=VARCHAR}, #{mo.coverUrl,jdbcType=VARCHAR}, #{mo.coverSize,jdbcType=NUMERIC},
+         #{mo.browseNum }, #{mo.commentNum }, #{mo.downloadNum },
+         #{mo.udpateNum }, #{mo.printNum }, #{mo.correctionNum },
+         #{mo.reserve1,jdbcType=VARCHAR}, #{mo.reserve2,jdbcType=VARCHAR}, #{mo.reserve3,jdbcType=VARCHAR},
+         #{mo.reserve4,jdbcType=VARCHAR}, #{mo.projectId,jdbcType=VARCHAR}, #{mo.createUser,jdbcType=VARCHAR},
+         #{mo.createTime,jdbcType=TIMESTAMP}, #{mo.updateUser,jdbcType=VARCHAR}, #{mo.updateTime,jdbcType=TIMESTAMP}
+
+         )
+
+     </foreach>
+
+
+    </insert>
+    <!--修改多个-->
+      <update id="updMultiBaseDocument" parameterType="java.util.List">
+
+          <foreach collection="list" item="mo" separator=";">
+              update base_document
+              <set>
+                  <if test="mo.name != null">
+                      name = #{mo.name},
+                  </if>
+                  <if test="mo.type != null">
+                      type = #{mo.type},
+                  </if>
+
+                  <if test="mo.size != null">
+                      size = #{mo.size,
+                  </if>
+                  <if test="mo.suffix != null">
+                      type = #{mo.suffix},
+                  </if>
+                  <if test="mo.suffix != null">
+                      suffix = #{mo.suffix},
+                  </if>
+                  <if test="mo.pid != null">
+                      pid = #{mo.pid},
+                  </if>
+                  <if test="mo.url != null">
+                      url = #{mo.url},
+                  </if>
+                  <if test="mo.weight != null">
+                      weight = #{mo.weight},
+                  </if>
+                  <if test="mo.categoryId != null">
+                      category_id = #{mo.category_id},
+                  </if>
+                  <if test="mo.deptId != null">
+                      dept_id = #{mo.dept_id},
+                  </if>
+                  <if test="mo.coverUrl != null">
+                      cover_url = #{mo.cover_url},
+                  </if>
+
+
+
+                  update_user = #{mo.updateUser,jdbcType=VARCHAR},
+                  update_time = #{mo.updateTime,jdbcType=TIMESTAMP}
+
+              </set>
+              where id = #{mo.id,jdbcType=VARCHAR}
+          </foreach>
+
+      </update>
+ <!--   /*    cover_size = #{mo.coverSize,jdbcType=NUMERIC},
+    browse_num = #{mo.browseNum },
+    comment_num = #{mo.commentNum },
+    download_num = #{mo.downloadNum },
+    udpate_num = #{mo.udpateNum },
+    print_num = #{mo.printNum },
+    correction_num = #{mo.correctionNum },
+    reserve1 = #{mo.reserve1,jdbcType=VARCHAR},
+    reserve2 = #{mo.reserve2,jdbcType=VARCHAR},
+    reserve3 = #{mo.reserve3,jdbcType=VARCHAR},
+    reserve4 = #{mo.reserve4,jdbcType=VARCHAR},
+    projectId = #{mo.projectId,jdbcType=VARCHAR},*/-->
+    <!--统计查询-->
+    <select id="getStatistics" resultType="int" parameterType="int">
+        SELECT COUNT
+                   ( * )
+        FROM
+            base_document WHERE weight = #{weight}
+
+    </select>
+   <!--分类统计-->
+     <select id="getCompareStatistics" resultMap="BaseResultMaps" parameterType="BaseDocumentVO">
+         SELECT
+           b.*,
+           bc.name as categoryName
+
+         FROM
+             base_document b left join base_document_category bc
+              on b.category_id = bc.id
+         <where>
+             <if test="name != null and name != '' " >
+                 AND b.name LIKE CONCAT('%',#{name},'%')
+             </if>
+             <if test="categoryName != null and categoryName != '' " >
+                 AND bc.name LIKE CONCAT('%',#{categoryName},'%')
+             </if>
+
+
+             <if test="createUser != null and createUser != ''" >
+                 AND b.create_user LIKE CONCAT('%',#{createUser},'%')
+             </if>
+
+             <if test="type != null" >
+                 AND  b.type = #{type}
+             </if>
+
+             <if test="weight != null" >
+                 AND  b.weight = #{weight}
+             </if>
+
+             <if test="beginCreateTime != null and endCreateTime != null">
+                 AND b.create_time BETWEEN #{beginCreateTime} and #{endCreateTime}
+             </if>
+
+         </where>
+
+         <choose>
+             <when test="number == 1 ">
+                 ORDER BY b.comment_num desc
+             </when>
+             <when test="number == 2">
+                 ORDER BY b.download_num desc
+             </when>
+             <when test="number == 3">
+                 ORDER BY b.browse_num desc
+             </when>
+             <when test="number == 0">
+                 ORDER BY b.create_time desc
+             </when>
+            <otherwise>
+
+            </otherwise>
+         </choose>
+
+
+
+     </select>
+    <!--统计知识库文档数-->
+     <select id="getNumberOfDocumentsCount" resultType="java.util.Map">
+
+         SELECT
+             bc.NAME,
+             count( b.id ) AS value
+         FROM
+             base_document_category bc
+             LEFT JOIN base_document b ON bc.ID = b.category_id
+         GROUP BY
+             bc.NAME
+
+
+     </select>
+    <!--知识文档近一个月下载数统计-->
+      <select id="getDownloadCount" resultType="java.util.Map">
+          SELECT
+              bc."name",
+              count( s.category_id ) as value
+          FROM
+              base_document_category bc
+                  LEFT JOIN base_statistics s ON bc.id = s.category_id
+          WHERE
+              s."type" = 0
+            AND s.create_time > ( SELECT CURRENT_TIMESTAMP - INTERVAL '1 month' )
+          GROUP BY
+              bc."name"
+         order by value desc
+      </select>
+
+   <!--近7天浏览量-->
+    <select id="getStatisticsByTime" resultType="java.util.Map" >
+        SELECT
+            create_time AS NAME,
+            count( id ) AS
+            VALUE
+        FROM
+            base_statistics s
+        WHERE
+            "type" = 1
+            AND create_time > ( SELECT CURRENT_DATE - INTERVAL '7 day' )
+        GROUP BY
+            NAME
+        ORDER BY
+            NAME
+    </select>
+
+
+</mapper>

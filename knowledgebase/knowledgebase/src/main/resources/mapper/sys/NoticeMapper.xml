@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.sys.mapper.INoticeMapper" >
+    <!--  结果通知公告扩展map -->
+    <resultMap type="NoticeVO" id="noticeVOMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="introduction" property="introduction"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="user_name" property="userName"/>
+    </resultMap>
+    
+    <!--  结果基础通知公告扩展map -->
+    <resultMap type="Notice" id="noticeMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="introduction" property="introduction"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!-- 插入通知公告 -->
+    <insert id="insertNotice" parameterType="Notice">
+        INSERT INTO base_notice
+        ( name, id, introduction, create_user)
+        VALUES
+        ( #{name}, #{id}, #{introduction}, #{createUser})
+    </insert>
+    
+    <!-- 批量插入通知公告 -->
+    <insert id="insertBatchNotice" parameterType="java.util.List">
+        INSERT INTO base_notice
+        ( name, id, introduction, create_user)
+        VALUES
+        <foreach collection="notices" item="notice" separator="," close=";">
+	        ( #{notice.name}, #{notice.id}, #{notice.introduction}, #{notice.createUser})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除通知公告 -->
+    <delete id="deleteNoticeById" parameterType="String">
+        DELETE 
+        FROM
+            base_notice 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除通知公告 -->
+    <delete id="deleteBatchNoticeById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            base_notice 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改通知公告 -->
+    <update id="updateNotice" parameterType="Notice">
+        UPDATE base_notice 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="introduction != null">
+                introduction = #{introduction},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 根据id查询通知公告 -->
+    <select id="selectNoticeById" parameterType="String" resultMap="noticeMap">
+        SELECT
+            id,
+            name,
+            introduction,
+            create_time
+        FROM
+            base_notice
+        WHERE
+            id = #{id}
+    </select>
+    
+    <!-- 根据通知公告名查询通知公告 -->
+    <select id="selectNoticeByName" parameterType="String" resultMap="noticeVOMap">
+        SELECT
+            id
+        FROM
+            base_notice
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有通知公告 -->
+    <select id="selectNoticeList" parameterType="Notice" resultMap="noticeVOMap">
+        SELECT
+            bj.id,
+            bj.name,
+            bj.introduction,
+            bj.create_time,
+            su.nick_name AS user_name
+        FROM
+            base_notice AS bj
+            LEFT JOIN sys_user AS su ON su.name = bj.create_user
+        <where>
+            <if test="name != null and name != ''">
+                AND bj.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND bj.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY bj.create_time DESC
+    </select>
+</mapper>

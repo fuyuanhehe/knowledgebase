@@ -1,0 +1,27 @@
+.pr {
+  position: relative !important;
+}
+
+.pa {
+  position: absolute !important;
+}
+
+.center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tt_50_50 {
+  transform: translate(-50%, -50%);
+}
+
+.tt_50 {
+  transform: translate(-50%, 0%);
+}
+
+.flex_jcc_aic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

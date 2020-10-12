@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.proj.mapper.IProjectStageMapper" >
+
+    <resultMap id="BaseResultMap" type="com.hg.knowledgebase.module.proj.entity.ProjectStage" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="blame_user_id" property="blameUserId" jdbcType="VARCHAR" />
+        <result column="progress" property="progress" jdbcType="VARCHAR" />
+        <result column="valid_day" property="validDay" jdbcType="INTEGER" />
+        <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+        <result column="begin_date" property="beginDate" jdbcType="DATE" />
+        <result column="end_date" property="endDate" jdbcType="DATE" />
+    </resultMap>
+
+    <resultMap id="BaseResultMaps" type="com.hg.knowledgebase.module.proj.entity.VO.ProjectStageVO" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="blame_user_id" property="blameUserId" jdbcType="VARCHAR" />
+        <result column="progress" property="progress" jdbcType="VARCHAR" />
+        <result column="valid_day" property="validDay" jdbcType="INTEGER" />
+        <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+        <result column="begin_date" property="beginDate" jdbcType="DATE" />
+        <result column="end_date" property="endDate" jdbcType="DATE" />
+        <result column="userName" property="userName" jdbcType="VARCHAR" />
+    </resultMap>
+    <!--查询所有项目进度-->
+    <select id="getAllProjectStage" resultMap="BaseResultMaps" parameterType="ProjectStage">
+
+        SELECT
+        bs.*,u.nick_name AS blameUser
+        FROM
+        bus_project b
+        LEFT JOIN bus_project_stage bs ON b.ID = bs.project_id
+        LEFT JOIN  sys_user u on bs.blame_user_id = u.id
+            <where>
+                <if test="name != null  and name != ''" >
+                    and   bs.name = LIKE CONCAT('%',#{name},'%')
+                </if>
+                <if test="progress != null and progress != '' " >
+                    and  bs.progress = #{progress}
+                </if>
+
+                <if test="blameUserId != null" >
+                    and  bs.blame_user_id = #{blameUserId,jdbcType=VARCHAR}
+                </if>
+
+                <if test="validDay != null" >
+                    and  bs.valid_day = #{validDay,jdbcType=INTEGER}
+                </if>
+                <if test="createUser != null" >
+                    and   bs.create_user = #{createUser,jdbcType=VARCHAR}
+                </if>
+
+                <if test="projectId != null" >
+                   and bs.project_id = #{projectId,jdbcType=VARCHAR}
+                </if>
+
+            </where>
+      order by bs.create_time desc
+
+    </select>
+
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from bus_project_stage
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from bus_project_stage
+        where name = #{name,jdbcType=VARCHAR}
+    </select>
+
+
+    <sql id="Base_Column_List" >
+        id, name, blame_user_id, progress, valid_day, create_user, create_time, update_user,
+        update_time, project_id, begin_date, end_date
+    </sql>
+    <!-- 根据删除项目阶段 -->
+    <delete id="deleteProjectStage" parameterType="ProjectStage">
+        DELETE
+        FROM
+            bus_project_stage
+        <where>
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="projectId != null">
+                AND project_id = #{projectId}
+            </if>
+        </where>
+    </delete>
+
+    <!-- 根据id批量删除项目阶段 -->
+    <delete id="deleteBatchProjectStageById" parameterType="java.util.List">
+        DELETE
+        FROM
+            bus_project_stage
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+
+    <!-- 根据项目id批量删除项目阶段 -->
+    <delete id="deleteBatchProjectStageByProjectId" parameterType="java.util.List">
+        DELETE
+        FROM
+            bus_project_stage
+        WHERE
+            <foreach collection="projectIds" item="projectId" separator="or">
+                project_id = #{projectId}
+            </foreach>
+    </delete>
+
+
+    <insert id="insertSelective" parameterType="com.hg.knowledgebase.module.proj.entity.ProjectStage" >
+        insert into bus_project_stage
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="name != null" >
+                name,
+            </if>
+            <if test="blameUserId != null" >
+                blame_user_id,
+            </if>
+            <if test="progress != null" >
+                progress,
+            </if>
+            <if test="validDay != null" >
+                valid_day,
+            </if>
+            <if test="createUser != null" >
+                create_user,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="updateUser != null" >
+                update_user,
+            </if>
+            <if test="updateTime != null" >
+                update_time,
+            </if>
+            <if test="projectId != null" >
+                project_id,
+            </if>
+            <if test="beginDate != null" >
+                begin_date,
+            </if>
+            <if test="endDate != null" >
+                end_date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null" >
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="blameUserId != null" >
+                #{blameUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="progress != null" >
+                #{progress,jdbcType=VARCHAR},
+            </if>
+            <if test="validDay != null" >
+                #{validDay,jdbcType=INTEGER},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="projectId != null" >
+                #{projectId,jdbcType=VARCHAR},
+            </if>
+            <if test="beginDate != null" >
+                #{beginDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null" >
+                #{endDate,jdbcType=DATE},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.hg.knowledgebase.module.proj.entity.ProjectStage" >
+        update bus_project_stage
+        <set >
+            <if test="name != null" >
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="blameUserId != null" >
+                blame_user_id = #{blameUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="progress != null" >
+                progress = #{progress,jdbcType=VARCHAR},
+            </if>
+            <if test="validDay != null" >
+                valid_day = #{validDay,jdbcType=INTEGER},
+            </if>
+            <if test="createUser != null" >
+                create_user = #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUser != null" >
+                update_user = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="projectId != null" >
+                project_id = #{projectId,jdbcType=VARCHAR},
+            </if>
+            <if test="beginDate != null" >
+                begin_date = #{beginDate,jdbcType=DATE},
+            </if>
+            <if test="endDate != null" >
+                end_date = #{endDate,jdbcType=DATE},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+
+    <!-- 根据标题名查询项目阶段 -->
+    <select id="selectProjectStageByName" parameterType="String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM
+            bus_project_stage
+        WHERE
+            name = #{name}
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.repo.mapper.BaseDocumentCategoryMapper" >
+
+    <resultMap id="BaseResultMap" type="com.hg.knowledgebase.module.repo.entity.BaseDocumentCategory" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="url" property="url" jdbcType="VARCHAR" />
+        <result column="dept_id" property="deptId" jdbcType="VARCHAR" />
+        <result column="addroval_time" property="addrovalTime" jdbcType="TIMESTAMP" />
+        <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="status" property="status" jdbcType="SMALLINT" />
+        <result column="approval_opinion" property="approvalOpinion" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, name, url, dept_id, addroval_time, create_user, update_user, create_time, update_time,
+        status, approval_opinion
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from base_document_category
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+        delete from base_document_category
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.hg.knowledgebase.module.repo.entity.BaseDocumentCategory" >
+        insert into base_document_category (id, name, url,
+                                            dept_id, addroval_time, create_user,
+                                            update_user, create_time, update_time,
+                                            status, approval_opinion)
+        values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR},
+                #{deptId,jdbcType=VARCHAR}, #{addrovalTime,jdbcType=TIMESTAMP}, #{createUser,jdbcType=VARCHAR},
+                #{updateUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+                #{status,jdbcType=SMALLINT}, #{approvalOpinion,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.hg.knowledgebase.module.repo.entity.BaseDocumentCategory" >
+        insert into base_document_category
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="name != null" >
+                name,
+            </if>
+            <if test="url != null" >
+                url,
+            </if>
+            <if test="deptId != null" >
+                dept_id,
+            </if>
+            <if test="addrovalTime != null" >
+                addroval_time,
+            </if>
+            <if test="createUser != null" >
+                create_user,
+            </if>
+            <if test="updateUser != null" >
+                update_user,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="updateTime != null" >
+                update_time,
+            </if>
+            <if test="status != null" >
+                status,
+            </if>
+            <if test="approvalOpinion != null" >
+                approval_opinion,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null" >
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null" >
+                #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null" >
+                #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="addrovalTime != null" >
+                #{addrovalTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null" >
+                #{status,jdbcType=SMALLINT},
+            </if>
+            <if test="approvalOpinion != null" >
+                #{approvalOpinion,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.hg.knowledgebase.module.repo.entity.BaseDocumentCategory" >
+        update base_document_category
+        <set >
+            <if test="name != null" >
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null" >
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null" >
+                dept_id = #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="addrovalTime != null" >
+                addroval_time = #{addrovalTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null" >
+                create_user = #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                update_user = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null" >
+                status = #{status,jdbcType=SMALLINT},
+            </if>
+            <if test="approvalOpinion != null" >
+                approval_opinion = #{approvalOpinion,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.hg.knowledgebase.module.repo.entity.BaseDocumentCategory" >
+        update base_document_category
+        set name = #{name,jdbcType=VARCHAR},
+            url = #{url,jdbcType=VARCHAR},
+            dept_id = #{deptId,jdbcType=VARCHAR},
+            addroval_time = #{addrovalTime,jdbcType=TIMESTAMP},
+            create_user = #{createUser,jdbcType=VARCHAR},
+            update_user = #{updateUser,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            status = #{status,jdbcType=SMALLINT},
+            approval_opinion = #{approvalOpinion,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+   
+      <!--文档类别查询所有-->
+    <select id="selectBaseDocumentCategoryList" parameterType="com.hg.knowledgebase.module.repo.entity.BaseDocumentCategory"
+    resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from base_document_category
+         <where>
+             <if test="name != null" >
+                 AND name LIKE CONCAT('%',#{name},'%')
+             </if>
+             <if test="deptId != null" >
+                 and  dept_id = #{deptId,jdbcType=VARCHAR},
+             </if>
+
+             <if test="createUser != null" >
+                 and  create_user = #{createUser,jdbcType=VARCHAR},
+             </if>
+             <if test="updateUser != null" >
+                 and  update_user = #{updateUser,jdbcType=VARCHAR},
+             </if>
+
+             <if test="list != null and list.size > 0"  >
+                 and  status in
+                 <foreach collection="list" item="id" open="(" separator="," close=")" >
+                      #{id}
+                 </foreach>
+
+             </if>
+
+         </where>
+        order by create_time desc
+    </select>
+
+</mapper>

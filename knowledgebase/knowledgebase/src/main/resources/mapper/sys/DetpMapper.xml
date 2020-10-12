@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.sys.mapper.IDeptMapper" >
+    <!--  结果部门扩展map -->
+    <resultMap type="DeptVO" id="deptVOMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="pid" property="pid"/>
+        <result column="pname" property="pname"/>
+        <result column="count" property="count"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!--  结果基础部门扩展map -->
+    <resultMap type="Dept" id="baseDeptMap">
+        <id column="id" property="id"/>
+        <id column="pid" property="pid"/>
+        <result column="name" property="name"/>
+    </resultMap>
+    
+    <!-- 插入部门 -->
+    <insert id="insertDept" parameterType="Dept">
+        INSERT INTO sys_dept
+        ( name, id, pid, create_user)
+        VALUES
+        ( #{name}, #{id}, #{pid}, #{createUser})
+    </insert>
+    
+    <!-- 批量插入部门 -->
+    <insert id="insertBatchDept" parameterType="java.util.List">
+        INSERT INTO sys_dept
+        ( name, id, pid, create_user)
+        VALUES
+        <foreach collection="depts" item="dept" separator="," close=";">
+	        ( #{dept.name}, #{dept.id}, #{dept.pid}, #{dept.createUser})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除部门 -->
+    <delete id="deleteDeptById" parameterType="String">
+        DELETE 
+        FROM
+            sys_dept 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除部门 -->
+    <delete id="deleteBatchDeptById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            sys_dept 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改部门 -->
+    <update id="updateDept" parameterType="Dept">
+        UPDATE sys_dept 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="pid != null">
+                pid = #{pid},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 根据id查询部门 -->
+    <select id="selectDeptById" parameterType="String" resultMap="deptVOMap">
+        SELECT
+            sd.ID,
+            sd.NAME,
+            sd.pid,
+            CASE
+	            WHEN sdp.NAME IS NULL THEN
+	            '' ELSE sdp.NAME 
+	            END AS pname 
+        FROM
+            sys_dept AS sd
+            LEFT JOIN sys_dept AS sdp ON sd.pid = sdp.ID
+        WHERE
+            sd.id = #{id}
+    </select>
+    
+    <!--  根据用户查询部门 -->
+    <select id="selectDeptByUser" parameterType="String" resultMap="baseDeptMap">
+        SELECT
+            sd.ID,
+            sd.NAME,
+            sd.pid 
+        FROM
+            sys_dept AS sd
+            JOIN sys_user AS su ON sd.ID = su.dept_id 
+        WHERE
+            su.NAME = #{userName}
+    </select>
+    
+    
+    <!-- 根据部门名查询部门 -->
+    <select id="selectDeptByName" parameterType="String" resultMap="deptVOMap">
+        SELECT
+            id
+        FROM
+            sys_dept
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有部门 -->
+    <select id="selectDeptList" parameterType="Dept" resultMap="deptVOMap">
+        SELECT
+            sd.id,
+            sd.NAME,
+            sd.pid,
+            sdp.name AS pname 
+        FROM
+            sys_dept AS sd
+            LEFT JOIN sys_dept AS sdp ON sd.pid = sdp.id
+        <where>
+            <if test="pid != null and pid != ''">
+                AND sd.pid = #{pid}
+            </if>
+            <if test="name != null and name != ''">
+                AND sd.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND sd.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY sd.create_time DESC
+    </select>
+    
+    <!-- 查询所有基础部门 -->
+    <select id="selectBaseDeptList" parameterType="Dept" resultMap="baseDeptMap">
+        SELECT
+            id,
+            pid,
+            NAME
+        FROM
+            sys_dept
+        <where>
+            <if test="pid != null and pid != ''">
+                AND pid = #{pid}
+            </if>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- 查询部门总数 -->
+    <select id="selectDeptCount" resultType="int" parameterType="Dept">
+        SELECT
+            count( id ) 
+        FROM
+            sys_dept
+        <where>
+            <if test="pid != null and pid != ''">
+                AND pid = #{pid}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+    </select>
+    
+    <!--  查询部门分组 -->
+    <select id="selectDeptGroup" resultMap="deptVOMap" parameterType="Dept">
+        SELECT
+            sd.NAME,
+            su.count 
+        FROM
+            sys_dept AS sd
+            LEFT JOIN ( SELECT dept_id, count( 1 ) FROM sys_user WHERE 1 = 1 GROUP BY dept_id ) AS su ON sd.id = su.dept_id 
+        <where>
+            <if test="pid != null and pid != ''">
+                sd.pid = #{pid}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+    </select>
+</mapper>

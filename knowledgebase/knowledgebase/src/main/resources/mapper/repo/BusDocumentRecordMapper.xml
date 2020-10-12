@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.repo.mapper.BusDocumentRecordMapper" >
+
+    <resultMap id="BaseResultMap" type="com.hg.knowledgebase.module.repo.entity.BusDocumentRecord" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="document_id" property="documentId" jdbcType="VARCHAR" />
+        <result column="dept_id" property="deptId" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="SMALLINT" />
+        <result column="status" property="status" jdbcType="SMALLINT" />
+        <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="reserve1" property="reserve1" jdbcType="VARCHAR" />
+        <result column="reserve2" property="reserve2" jdbcType="VARCHAR" />
+        <result column="reserve3" property="reserve3" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, document_id, dept_id, type, status, create_user, create_time, reserve1, reserve2, 
+        reserve3
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+
+        SELECT
+            b.ID,
+            b.document_id,
+            b.dept_id,
+            b.TYPE,
+            b.STATUS,
+            b.create_user,
+            b.create_time,
+            d.NAME AS reserve1,  --评论所属部门
+            bd.name as reserve2, -- 所属文件名称
+            sd.name as reserve3   --文件所属部门
+
+        FROM
+            bus_document_record b
+                LEFT JOIN sys_dept d ON b.dept_id = d.ID
+                LEFT JOIN base_document bd on b.document_id = bd.id
+
+                LEFT JOIN sys_user u on bd.create_user = u.name
+                LEFT JOIN sys_dept sd on u.dept_id = sd.id
+        where b.id = #{id}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+        delete from bus_document_record
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.hg.knowledgebase.module.repo.entity.BusDocumentRecord" >
+        insert into bus_document_record (id, document_id, dept_id,
+            type, status, create_user,
+            create_time, reserve1, reserve2,
+            reserve3)
+        values (#{id,jdbcType=VARCHAR}, #{documentId,jdbcType=VARCHAR}, #{deptId,jdbcType=VARCHAR},
+            #{type,jdbcType=SMALLINT}, #{status,jdbcType=SMALLINT}, #{createUser,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP}, #{reserve1,jdbcType=VARCHAR}, #{reserve2,jdbcType=VARCHAR},
+            #{reserve3,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.hg.knowledgebase.module.repo.entity.BusDocumentRecord" >
+        insert into bus_document_record
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="documentId != null" >
+                document_id,
+            </if>
+            <if test="deptId != null" >
+                dept_id,
+            </if>
+            <if test="type != null" >
+                type,
+            </if>
+            <if test="status != null" >
+                status,
+            </if>
+            <if test="createUser != null" >
+                create_user,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="reserve1 != null" >
+                reserve1,
+            </if>
+            <if test="reserve2 != null" >
+                reserve2,
+            </if>
+            <if test="reserve3 != null" >
+                reserve3,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="documentId != null" >
+                #{documentId,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null" >
+                #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null" >
+                #{type,jdbcType=SMALLINT},
+            </if>
+            <if test="status != null" >
+                #{status,jdbcType=SMALLINT},
+            </if>
+            <if test="createUser != null" >
+                #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="reserve1 != null" >
+                #{reserve1,jdbcType=VARCHAR},
+            </if>
+            <if test="reserve2 != null" >
+                #{reserve2,jdbcType=VARCHAR},
+            </if>
+            <if test="reserve3 != null" >
+                #{reserve3,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.hg.knowledgebase.module.repo.entity.BusDocumentRecord" >
+        update bus_document_record
+        <set >
+            <if test="documentId != null" >
+                document_id = #{documentId,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null" >
+                dept_id = #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null" >
+                type = #{type,jdbcType=SMALLINT},
+            </if>
+            <if test="status != null" >
+                status = #{status,jdbcType=SMALLINT},
+            </if>
+            <if test="createUser != null" >
+                create_user = #{createUser,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="reserve1 != null" >
+                reserve1 = #{reserve1,jdbcType=VARCHAR},
+            </if>
+            <if test="reserve2 != null" >
+                reserve2 = #{reserve2,jdbcType=VARCHAR},
+            </if>
+            <if test="reserve3 != null" >
+                reserve3 = #{reserve3,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.hg.knowledgebase.module.repo.entity.BusDocumentRecord" >
+        update bus_document_record
+        set document_id = #{documentId,jdbcType=VARCHAR},
+            dept_id = #{deptId,jdbcType=VARCHAR},
+            type = #{type,jdbcType=SMALLINT},
+            status = #{status,jdbcType=SMALLINT},
+            create_user = #{createUser,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            reserve1 = #{reserve1,jdbcType=VARCHAR},
+            reserve2 = #{reserve2,jdbcType=VARCHAR},
+            reserve3 = #{reserve3,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <!--get page-->
+    <select id="getBusDocumentRecordPage" resultMap="BaseResultMap" parameterType="BusDocumentRecord">
+        select
+        b.id, b.document_id,
+        b.dept_id, b.type, b.status,
+        b.create_user, b.create_time,
+        d.name as reserve1
+         from
+        bus_document_record b
+        LEFT JOIN sys_dept d ON b.dept_id = d.ID
+
+
+        <where>
+            <if test="documentId != null" >
+               and b.document_id = #{documentId,jdbcType=VARCHAR}
+            </if>
+            <if test="deptId != null" >
+                AND  b.dept_id = #{deptId,jdbcType=VARCHAR}
+            </if>
+            <if test="type != null" >
+                AND   b.type = #{type,jdbcType=SMALLINT}
+            </if>
+            <if test="status != null" >
+                AND b.status = #{status,jdbcType=SMALLINT}
+            </if>
+            <if test="createUser != null" >
+                AND b.create_user = #{createUser,jdbcType=VARCHAR}
+            </if>
+            <if test="createTime != null" >
+                AND b.create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="reserve1 != null" >
+                AND b.reserve1 = #{reserve1,jdbcType=VARCHAR}
+            </if>
+            <if test="reserve2 != null" >
+                AND b.reserve2 = #{reserve2,jdbcType=VARCHAR}
+            </if>
+            <if test="reserve3 != null" >
+              AND  b.reserve3 = #{reserve3,jdbcType=VARCHAR}
+            </if>
+
+        </where>
+
+   order  by b.create_time desc
+    </select>
+
+
+</mapper>

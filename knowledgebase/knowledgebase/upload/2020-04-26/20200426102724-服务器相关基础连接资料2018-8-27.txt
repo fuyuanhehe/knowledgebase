@@ -1,0 +1,83 @@
+禅道地址：http://139.159.225.26:9000/zentao/user-login-L3plbnRhby9idWctYnJvd3NlLTgtMC11bnJlc29sdmVkLTAuaHRtbA==.html
+
+蓝图地址：https://lanhuapp.com/web/#/item/board?pid=dca530f6-b751-4c73-a060-0c95cf856038
+
+git地址:
+	url=http://116.62.9.38:8080/gitblit/repositories/
+
+
+资料仓库：\\192.168.0.150 hounify/hg@2015
+
+阿里云DB
+hg-hounify.mysql.rds.aliyuncs.com
+账号:root
+密码:!@Hg123^
+
+测试环境：
+	测试数据库（MySQL）：
+		url：hg-hounify.mysql.rds.aliyuncs.com
+		端口：22		
+		用户名：kwadmin
+		密码：Hghounify!
+
+	测试服务器：
+		ip：116.62.45.61
+		用户名：root
+		密码：hgLINUX!@#3901
+
+	liferay服务器地址：http://www.hounify.com:8082/zh/web/bbkw
+	liferay账号：admin
+	liferay密码：hghounify
+	平台超管账号：13983312430
+	平台超管密码：123456
+
+生产环境：
+	生产数据库（MySQL）：
+		url: hg-hounify.mysql.rds.aliyuncs.com
+		用户名：kwuser
+		密码：!HGKW!
+
+	生产服务器：
+		ip：47.99.78.204
+		端口：22
+		用户名：root
+		密码：bbkw!@#3901
+
+	liferay服务器地址：http://www.bbkwcg.com（目前是www.bbkwcg.com:8081）
+	liferay账号：admin
+	liferay密码：hghounify
+	平台超管账号：17320323441
+	平台超管密码：123456
+
+
+阿里云unbuntu
+服务器3：116.62.71.60
+用户名：root
+密码：hounify%gd)mj&2015
+
+新农村 119.3.207.177
+root 1qaz@WSX
+
+119.3.194.115 root Hit.bit.aim-1124
+
+
+47.110.76.241
+root
+hgLINUXnew!@#3901
+
+
+正式环境 (新农村)
+222.198.115.78（后台服务器）
+222.198.115.95（前端服务器）
+222.198.115.96（数据库服务器）
+root
+1qaz@WSX3edc
+
+
+
+小程序服务器
+服务器
+47.110.76.241 (4核 接口服务器)
+centos7	root	hgLINUXnew!@#3901
+配置域名
+lxsw.hounify.com

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.community.mapper.ICollectionMapper" >
+    <!--  结果收藏扩展map -->
+    <resultMap type="CollectionVO" id="collectionVOMap">
+        <id column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="document_id" property="documentId"/>
+        <result column="topic_id" property="topicId"/>
+        <result column="document_name" property="documentName"/>
+        <result column="topic_name" property="topicName"/>
+    </resultMap>
+    
+    <!--  结果收藏map -->
+    <resultMap type="Collections" id="collectionMap">
+        <id column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="document_id" property="documentId"/>
+        <result column="topic_id" property="topicId"/>
+    </resultMap>
+    
+    <!-- 插入收藏 -->
+    <insert id="insertCollection" parameterType="Collections">
+        INSERT INTO bus_collection
+        ( id, type, document_id, topic_id, create_user)
+        VALUES
+        ( #{id}, #{type}, #{documentId}, #{topicId}, #{createUser})
+    </insert>
+    
+    <!-- 删除收藏 -->
+    <delete id="deleteCollection" parameterType="Collections">
+        DELETE 
+        FROM
+            bus_collection 
+        <where>
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="documentId != null">
+                AND document_id = #{documentId}
+            </if>
+            <if test="topicId != null">
+                AND topic_id = #{topicId}
+            </if>
+        </where>
+    </delete>
+    
+    <!-- 批量删除收藏 -->
+    <delete id="deleteBatchCollection" parameterType="java.util.List">
+        DELETE 
+        FROM
+            bus_collection 
+        WHERE
+            <foreach collection="collections" item="collection" separator="or">
+                <choose>
+                    <when test="collection.id != null">
+                        id = #{collection.id}
+                    </when>
+                    <when test="collection.documentId != null">
+                        document_id = #{collection.documentId}
+                    </when>
+                    <when test="collection.topicId != null">
+                        topic_id = #{collection.topicId}
+                    </when>
+                    <when test="collection.type != null">
+                        type = #{collection.type}
+                    </when>
+                </choose>
+            </foreach>
+    </delete>
+    
+    <!-- 根据id查询收藏 -->
+    <select id="selectCollectionById" parameterType="String" resultMap="collectionVOMap">
+        SELECT
+            ID,
+            type,
+            document_id,
+            topic_id,
+            create_user
+        FROM
+            bus_collection
+        WHERE
+            id = #{id}
+    </select>
+    
+    <!-- 查询基础所有收藏 -->
+    <select id="selectBaseCollectionList" parameterType="Collections" resultMap="collectionMap">
+        SELECT
+            id
+        FROM
+            bus_collection
+        <where>
+            <if test="documentId != null and documentId != ''">
+                AND document_id = #{documentId}
+            </if>
+            <if test="topicId != null and topicId != ''">
+                AND topic_id = #{topicId}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="createUser != null and createUser != ''">
+                AND create_user = #{createUser}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+    </select>
+    
+    <!-- 查询所有收藏 -->
+    <select id="selectCollectionList" parameterType="Collections" resultMap="collectionVOMap">
+        SELECT
+            bc.ID,
+            bc.type,
+            bc.create_time,
+            bc.document_id,
+            bc.topic_id,
+            su.nick_name AS collection_user
+        FROM
+            bus_collection AS bc
+            LEFT JOIN sys_user AS su ON su.name = bc.create_user
+        <where>
+            <if test="documentId != null and documentId != ''">
+                AND bc.document_id = #{documentId}
+            </if>
+            <if test="topicId != null and topicId != ''">
+                AND bc.topic_id = #{topicId}
+            </if>
+            <if test="type != null">
+                AND bc.type = #{type}
+            </if>
+            <if test="createUser != null and createUser != ''">
+                AND bc.create_user = #{createUser}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND bc.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY bc.create_time DESC
+    </select>
+    
+    <!-- 查询当前用户收藏文档列表 -->
+    <select id="selectCurrentCollectionDocList" parameterType="Collections" resultType="BaseDocumentVO">
+        SELECT
+            bd.ID,
+            bd.name,
+            bd.create_time AS "createTime",
+            bd.category_id AS "categoryId",
+            bdc.name AS "categoryName",
+            su.nick_name AS "createUserName"
+        FROM
+            bus_collection AS bc
+            JOIN base_document AS bd ON bd.id = bc.document_id
+            LEFT JOIN base_document_category AS bdc ON bdc.id = bd.category_id
+            LEFT JOIN sys_user AS su ON su.name = bd.create_user
+        <where>
+            bc.type = 0
+            AND bc.create_user = #{createUser}
+            <if test="search != null and search != ''">
+                AND bd.name LIKE CONCAT('%',#{search},'%')
+            </if>
+            <if test="documentId != null and documentId != ''">
+                AND bd.id = #{documentId}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND bd.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY bc.create_time DESC
+    </select>
+    
+    <!-- 查询收藏总数 -->
+    <select id="selectCollectionCount" resultType="int" parameterType="Collections">
+        SELECT
+            count( id ) 
+        FROM
+            bus_collection
+        <where>
+            <if test="documentId != null and documentId != ''">
+                AND document_id = #{documentId}
+            </if>
+            <if test="topicId != null and topicId != ''">
+                AND topic_id = #{topicId}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+    </select>
+</mapper>

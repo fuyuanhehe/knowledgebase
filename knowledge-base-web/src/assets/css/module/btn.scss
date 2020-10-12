@@ -1,0 +1,35 @@
+.btn_bg_blue {
+  @extend %btn-primary;
+  color:$color-text-white;
+  background: $color-btn-primary;
+  box-shadow:0 3px 10px 0 rgba(16,60,85,0.17);
+  &:focus, &:hover {
+    color: $color-text-white;
+    background: $color-text-blue;
+  }
+}
+.btn_border_blue {
+  @extend %btn-primary;
+  color: $color-btn-primary;
+  border:1px solid rgba(17,160,255,1);
+  &:focus, &:hover {
+    background: #F2F9FF;
+  }
+}
+.btn_border_blue_s {
+  @extend %btn-primary;
+  width: 80px;
+  height: 32px;
+  line-height: 32px;
+  color: $color-btn-primary;
+  border:1px solid rgba(17,160,255,1);
+  &:focus, &:hover {
+    background: #F2F9FF;
+  }
+}
+.btn_border_gray {
+  @extend %btn-primary;
+  color: $color-text-secondary;
+  border:1px solid $color-text-secondary;
+}
+

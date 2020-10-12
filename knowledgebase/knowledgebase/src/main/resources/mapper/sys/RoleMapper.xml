@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.sys.mapper.IRoleMapper" >
+    <!--  结果角色map -->
+    <resultMap type="Role" id="roleMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="status" property="status"/>
+        <result column="describe" property="describe"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!--  结果角色扩展map -->
+    <resultMap type="RoleVO" id="roleVOMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="status" property="status"/>
+        <result column="describe" property="describe"/>
+        <result column="user_count" property="userCount"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!--  结果角色扩展map -->
+    <resultMap type="RoleVO" id="roleVOMap2">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="status" property="status"/>
+        <result column="describe" property="describe"/>
+        <result column="user_count" property="userCount"/>
+        <collection property="menuIds" column="id" javaType="java.util.Set" select="selectRoleMenuByRoleId"></collection>
+        <collection property="powerIds" column="id" javaType="java.util.Set" select="selectRolePowerByRoleId"></collection>
+    </resultMap>
+    
+    <!--  结果基础菜单扩展map -->
+    <resultMap type="Menu" id="baseMenuMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="pid" property="pid"/>
+        <result column="url" property="url"/>
+        <result column="icon_url" property="iconUrl"/>
+        <result column="reserve" property="reserve"/>
+        <result column="coder" property="coder"/>
+    </resultMap>
+    
+    <!--  结果基础角色扩展map -->
+    <resultMap type="Role" id="baseRoleMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="coder" property="coder"/>
+        <result column="menu_id" property="menuId"/>
+    </resultMap>
+    
+    <!--  结果基础部门扩展map -->
+    <resultMap type="Power" id="basePowerMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+    
+    <!-- 插入角色 -->
+    <insert id="insertRole" parameterType="Role">
+        INSERT INTO sys_role
+        ( name, id, describe, create_user)
+        VALUES
+        ( #{name}, #{id}, #{describe}, #{createUser})
+    </insert>
+    
+    <!-- 批量插入角色 -->
+    <insert id="insertBatchRole" parameterType="java.util.List">
+        INSERT INTO sys_role
+        ( name, id, describe, create_user)
+        VALUES
+        <foreach collection="roles" item="role" separator="," close=";">
+	        ( #{role.name}, #{role.id}, #{role.describe}, #{role.createUser})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除角色 -->
+    <delete id="deleteRoleById" parameterType="String">
+        DELETE 
+        FROM
+            sys_role 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除角色 -->
+    <delete id="deleteBatchRoleById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            sys_role 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改角色 -->
+    <update id="updateRole" parameterType="Role">
+        UPDATE sys_role 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="describe != null">
+                describe = #{describe},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 根据id查询角色 -->
+    <select id="selectRoleById" parameterType="String" resultMap="roleVOMap2">
+        SELECT
+            id,
+            name,
+            status,
+            describe
+        FROM
+            sys_role
+        WHERE
+            id = #{id}
+    </select>
+    
+    <!-- 根据角色名查询角色 -->
+    <select id="selectRoleByName" parameterType="String" resultMap="roleMap">
+        SELECT
+            id
+        FROM
+            sys_role
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有角色 -->
+    <select id="selectRoleList" parameterType="Role" resultMap="roleVOMap">
+        SELECT
+            sr.id,
+            sr.NAME,
+            sr.status,
+            sr.create_time,
+            su.count AS user_count
+        FROM
+            sys_role AS sr
+            LEFT JOIN (SELECT role_id,COUNT(role_id) FROM sys_user GROUP BY role_id) AS su ON sr.id = su.role_id
+        <where>
+            <if test="status != null">
+                AND sr.status = #{status}
+            </if>
+            <if test="name != null and name != ''">
+                AND sr.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND sr.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY sr.create_time DESC
+    </select>
+    
+    <!-- 查询所有基础角色 -->
+    <select id="selectBaseRoleList" parameterType="Role" resultMap="baseRoleMap">
+        SELECT
+            id,
+            NAME
+        FROM
+            sys_role
+        <where>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- #########################角色菜单关系 #############################-->
+    <!-- 插入角色菜单 -->
+    <insert id="insertRoleMenu">
+        INSERT INTO sys_role_map_menu
+        ( role_id, menu_id )
+        VALUES
+        <foreach collection="menuIds" item="menuId" separator=",">
+            ( #{roleId}, #{menuId} )
+        </foreach>
+    </insert>
+    
+    <!-- 根据角色id删除角色菜单 -->
+    <delete id="deleteRoleMenuByRoleId" parameterType="String">
+        DELETE 
+        FROM
+            sys_role_map_menu 
+        WHERE
+            role_id = #{roleId}
+    </delete>
+    
+    <!--  根据角色id查询所有菜单 -->
+    <select id="selectMenuListByRoleId" parameterType="String" resultMap="baseMenuMap">
+        SELECT
+            sm.id,
+            sm.name,
+            sm.pid,
+            sm.url,
+            sm.icon_url,
+            sm.reserve
+        FROM
+            sys_menu AS sm
+        JOIN sys_role_map_menu AS srmm ON sm.id = srmm.role_id
+        WHERE
+            srmm.role_id = #{roleId}
+    </select>
+    
+    <!-- 根据角色id查询角色菜单 -->
+    <select id="selectRoleMenuByRoleId" parameterType="String" resultType="String">
+        SELECT
+            menu_id 
+        FROM
+            sys_role_map_menu 
+        WHERE
+            role_id = #{id}
+    </select>
+    
+    <!-- #########################角色权限关系 #############################-->
+    <!-- 插入角色菜单 -->
+    <insert id="insertRolePower">
+        INSERT INTO sys_role_map_power
+        ( role_id, power_id )
+        VALUES
+        <foreach collection="powerIds" item="powerId" separator=",">
+            ( #{roleId}, #{powerId} )
+        </foreach>
+    </insert>
+    
+    <!-- 根据角色id删除角色菜单 -->
+    <delete id="deleteRolePowerByRoleId" parameterType="String">
+        DELETE 
+        FROM
+            sys_role_map_power 
+        WHERE
+            role_id = #{roleId}
+    </delete>
+    
+    <!--  根据角色id查询所有权限 -->
+    <select id="selectPowerListByRoleId" parameterType="String" resultMap="basePowerMap">
+        SELECT
+            sm.id,
+            sm.name,
+            sm.coder,
+            sm.menu_id
+        FROM
+            sys_power AS sp
+        JOIN sys_role_map_power AS srmp ON sp.id = srmp.role_id
+        WHERE
+            srmp.role_id = #{roleId}
+    </select>
+    
+    <!-- 根据角色id查询角色权限 -->
+    <select id="selectRolePowerByRoleId" parameterType="String" resultType="String">
+        SELECT
+            power_id 
+        FROM
+            sys_role_map_power 
+        WHERE
+            role_id = #{id}
+    </select>
+</mapper>

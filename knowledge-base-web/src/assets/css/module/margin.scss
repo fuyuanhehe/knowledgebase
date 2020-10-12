@@ -1,0 +1,54 @@
+// margin
+$m: 5, 10, 15, 20;
+
+// margin-left
+$ml:0, 4, 5, 10, 15, 16, 20, 25, 30, 35, 40, 50, 55, 60, 80, 100, 200;
+
+// margin-right
+$mr: 4, 5, 10, 15, 20, 25, 30, 35, 40, 70;
+
+// margin-left/right
+$mlr: 5, 10, 15, 20;
+
+// margin-top
+$mt:0, 5, 10, 14, 15, 20, 25, 28, 30, 40, 50, 55, 60, 65, 75, 110;
+
+// margin-bottom
+$mb: 5, 10, 15, 20, 30, 40, 50;
+
+@each $i in $m {
+  .m#{$i} {
+    margin: #{$i}px !important;
+  }
+}
+
+@each $i in $ml {
+  .ml#{$i} {
+    margin-left: #{$i}px !important;
+  }
+}
+
+@each $i in $mr {
+  .mr#{$i} {
+    margin-right: #{$i}px !important;
+  }
+}
+
+@each $i in $mlr {
+  .mlr#{$i} {
+    margin: 0 #{$i}px !important;
+  }
+}
+
+
+@each $i in $mt {
+  .mt#{$i} {
+    margin-top: #{$i}px !important;
+  }
+}
+
+@each $i in $mb {
+  .mb#{$i} {
+    margin-bottom: #{$i}px !important;
+  }
+}

@@ -1,0 +1,28 @@
+.w1200 {
+  max-width: 1200px !important;
+  margin: auto;
+}
+.w1180 {
+  max-width: 1180px !important;
+  margin: auto;
+}
+.w33p {
+  width: 33.33333333%;
+}
+
+$w: 27,50, 70,100, 120, 150,200,250,260, 300,400,500, 600,650,700, 800;
+
+@each $i in $w {
+  .w#{$i} {
+    width: #{$i}px !important;
+  }
+}
+
+$wps: 5, 10, 15, 20, 25,26, 29, 30, 32, 35, 40, 50, 55, 60, 65, 68, 70, 80, 90, 100;
+
+@each $i in $wps {
+  .w#{$i}p {
+    width: #{$i}% !important;
+  }
+}
+

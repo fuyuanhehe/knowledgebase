@@ -1,0 +1,55 @@
+// padding
+$p: 5, 10, 15, 20, 30, 40;
+
+// padding-left
+$pl: 4, 5, 10, 15, 20, 35, 80;
+
+// padding-right
+$pr: 4, 5, 10, 15, 20, 30, 35;
+
+// padding-left/right
+$plr: 5, 10, 15, 20, 35;
+
+// padding-top
+$pt:0, 5, 10, 15, 20, 30, 45, 65, 75;
+
+// padding-bottom
+$pb: 5, 10, 15, 20, 30, 40;
+
+@each $i in $p {
+  .p#{$i} {
+    padding: #{$i}px !important;
+  }
+}
+
+@each $i in $ml {
+  .pl#{$i} {
+    padding-left: #{$i}px !important;
+  }
+}
+
+@each $i in $pr {
+  .pr#{$i} {
+    padding-right: #{$i}px !important;
+  }
+}
+
+@each $i in $plr {
+  .plr#{$i} {
+    padding-left: #{$i}px !important;
+    padding-right: #{$i}px !important;
+  }
+}
+
+
+@each $i in $pt {
+  .pt#{$i} {
+    padding-top: #{$i}px !important;
+  }
+}
+
+@each $i in $mb {
+  .pb#{$i} {
+    padding-bottom: #{$i}px !important;
+  }
+}

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.community.mapper.ICommentMapper" >
+    <!--  结果评论扩展map -->
+    <resultMap type="CommentVO" id="commentVOMap">
+        <id column="id" property="id"/>
+        <result column="pid" property="pid"/>
+        <result column="type" property="type"/>
+        <result column="content" property="content"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="comment_user" property="commentUser"/>
+        <result column="document_id" property="documentId"/>
+        <result column="topic_id" property="topicId"/>
+        <result column="comment_user_portrait" property="commentUserPortrait"/>
+        <result column="reply_user" property="replyUser"/>
+        <result column="document_name" property="documentName"/>
+        <result column="document_type_name" property="documentTypeName"/>
+        <result column="topic_name" property="topicName"/>
+        <result column="score" property="score"/>
+    </resultMap>
+    
+    <!--  结果评论扩展map（只查询两级） -->
+    <resultMap type="CommentVO" id="commentVOMap2">
+        <id column="id" property="id"/>
+        <result column="pid" property="pid"/>
+        <result column="type" property="type"/>
+        <result column="content" property="content"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="comment_user" property="commentUser"/>
+        <result column="document_id" property="documentId"/>
+        <result column="topic_id" property="topicId"/>
+        <result column="comment_user_portrait" property="commentUserPortrait"/>
+        <result column="reply_user" property="replyUser"/>
+        <result column="document_name" property="documentName"/>
+        <result column="document_type_name" property="documentTypeName"/>
+        <result column="topic_name" property="topicName"/>
+        <result column="score" property="score"/>
+        <collection property="childrenComment" column="{documentId=document_id,topicId=topic_id,type=type,pid=id}" 
+        javaType="java.util.List" ofType="com.hg.knowledgebase.module.community.entity.VO.CommentVO" 
+        select="selectChildrenCommentList"></collection>
+    </resultMap>
+    
+    <!-- 插入评论 -->
+    <insert id="insertComment" parameterType="Comment">
+        INSERT INTO bus_comment
+        ( id, pid, type, document_id, topic_id, content, score, reply_user, create_user)
+        VALUES
+        ( #{id}, #{pid}, #{type}, #{documentId}, #{topicId}, #{content}, #{score}, #{replyUser}, #{createUser})
+    </insert>
+    
+    <!-- 删除评论 -->
+    <delete id="deleteComment" parameterType="Comment">
+        DELETE 
+        FROM
+            bus_comment 
+        <where>
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="documentId != null">
+                AND document_id = #{documentId}
+            </if>
+            <if test="topicId != null">
+                AND topic_id = #{topicId}
+            </if>
+        </where>
+    </delete>
+    
+    <!-- 删除递归评论 -->
+    <delete id="recursionDeleteCommentById" parameterType="String">
+        DELETE
+        FROM
+        bus_comment
+        WHERE
+        ID IN (
+        WITH RECURSIVE r AS (
+        SELECT
+        ID,
+        pid
+        FROM
+        bus_comment
+        WHERE
+        ID = #{id}
+        UNION ALL
+        SELECT
+        bc.ID,
+        bc.pid
+        FROM
+        r,
+        bus_comment
+        bc
+        WHERE
+        r. ID = bc.pid
+        ) SELECT
+        ID
+        FROM
+        r
+        )
+    </delete>
+    
+    <!-- 批量删除评论 -->
+    <delete id="deleteBatchComment" parameterType="java.util.List">
+        DELETE 
+        FROM
+            bus_comment 
+        WHERE
+            <foreach collection="comments" item="comment" separator="or">
+                <choose>
+                    <when test="comment.id != null">
+                        id = #{comment.id}
+                    </when>
+                    <when test="comment.documentId != null">
+                        document_id = #{comment.documentId}
+                    </when>
+                    <when test="comment.topicId != null">
+                        topic_id = #{comment.topicId}
+                    </when>
+                    <when test="comment.type != null">
+                        type = #{comment.type}
+                    </when>
+                </choose>
+            </foreach>
+    </delete>
+    
+    <!-- 修改评论 -->
+    <update id="updateComment" parameterType="Comment">
+        UPDATE bus_comment 
+        SET
+        <trim suffixOverrides=",">
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="score != null">
+                score = #{score},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 根据id查询评论 -->
+    <select id="selectCommentById" parameterType="String" resultMap="commentVOMap">
+        SELECT
+            ID,
+            pid,
+            type,
+            document_id,
+            topic_id,
+            content,
+            score,
+            reply_user,
+            create_user
+        FROM
+            bus_comment
+        WHERE
+            id = #{id}
+    </select>
+    
+    <!-- 查询所有评论(一级评论) -->
+    <select id="selectCommentList" parameterType="Comment" resultMap="commentVOMap2">
+        SELECT
+            bc.ID,
+            bc.pid,
+            bc.score,
+            bc.type,
+            bc.content,
+            bc.create_time,
+            bc.document_id,
+            bc.topic_id,
+            bc.reply_user,
+            su.nick_name AS comment_user,
+            su.portrait AS comment_user_portrait
+        FROM
+            bus_comment AS bc
+            LEFT JOIN sys_user AS su ON su.name = bc.create_user
+        <where>
+            bc.pid = '0'
+            <if test="documentId != null and documentId != ''">
+                AND bc.document_id = #{documentId}
+            </if>
+            <if test="topicId != null and topicId != ''">
+                AND bc.topic_id = #{topicId}
+            </if>
+            <if test="type != null">
+                AND bc.type = #{type}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND bc.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY bc.create_time DESC
+    </select>
+    
+    <!-- 查询所有子集评论（回复） -->
+    <select id="selectChildrenCommentList" parameterType="Comment" resultType="CommentVO">
+        SELECT
+            bc.ID,
+            bc.pid,
+            bc.score,
+            bc.type,
+            bc.content,
+            bc.create_time AS "createTime",
+            bc.document_id AS "documentId",
+            bc.topic_id AS "topicId",
+            bc.reply_user AS "replyUser",
+            su.nick_name AS "commentUser",
+            su.portrait AS "commentUserPortrait"
+        FROM
+            bus_comment AS bc
+            LEFT JOIN sys_user AS su ON su.name = bc.create_user
+        <where>
+            bc.pid != '0' 
+            <if test="documentId != null and documentId != ''">
+                AND bc.document_id = #{documentId}
+            </if>
+            <if test="topicId != null and topicId != ''">
+                AND bc.topic_id = #{topicId}
+            </if>
+            <if test="type != null">
+                AND bc.type = #{type}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND bc.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+            <if test="pid != null and pid != ''">
+                AND bc.ID IN (
+	            WITH RECURSIVE r AS (
+	            SELECT
+	            ID,
+	            pid
+	            FROM
+	            bus_comment
+	            WHERE
+	            pid = #{pid}
+	            UNION ALL
+	            SELECT
+	            bc.ID,
+	            bc.pid
+	            FROM
+	            r,
+	            bus_comment
+	            bc
+	            WHERE
+	            r. ID = bc.pid
+	            ) SELECT
+	            ID
+	            FROM
+	            r
+	            )
+            </if>
+        </where>
+        ORDER BY bc.create_time
+    </select>
+    
+    <!-- 查询当前用户评论文档列表 -->
+    <select id="selectCurrentCommentDocList" parameterType="Comment" resultType="BaseDocumentVO">
+        SELECT
+            bd.ID,
+            bd.name,
+            bd.create_time AS "createTime",
+            bd.category_id AS "categoryId",
+            bdc.name AS "categoryName",
+            su.nick_name AS "createUserName"
+        FROM
+            bus_comment AS bc
+            JOIN base_document AS bd ON bd.id = bc.document_id
+            LEFT JOIN base_document_category AS bdc ON bdc.id = bd.category_id
+            LEFT JOIN sys_user AS su ON su.name = bd.create_user
+        <where>
+            bc.type = 0
+            AND bc.create_user = #{createUser}
+            <if test="search != null and search != ''">
+                AND bd.name LIKE CONCAT('%',#{search},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND bd.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY bc.create_time DESC
+    </select>
+    
+    <!-- 查询评论总数 -->
+    <select id="selectCommentCount" resultType="int" parameterType="Comment">
+        SELECT
+            count( id ) 
+        FROM
+            bus_comment
+        <where>
+            <if test="documentId != null and documentId != ''">
+                AND document_id = #{documentId}
+            </if>
+            <if test="topicId != null and topicId != ''">
+                AND topic_id = #{topicId}
+            </if>
+            <if test="pid != null and pid != ''">
+                AND pid = #{pid}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+    </select>
+</mapper>

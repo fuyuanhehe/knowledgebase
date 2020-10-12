@@ -1,0 +1,100 @@
+/* 匹配元素有flex的属性 则赋予display: flex; 样式*/
+[flex] {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+/* 内部元素水平居中*/
+[flex~="main:center"] {
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+/* 内部元素垂直居中*/
+[flex~="cross:center"] {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+/* 内部元素水平垂直居中*/
+[flex~="all:center"] {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items:center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+/* 两端对齐，项目之间的间隔都相等*/
+[flex~="main:justify"] {
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+/* 主轴从上到下排列*/
+[flex~="dir:top"] {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+
+
+// 主色
+$color-primary: #11A0FF;
+// ui 黄
+$color-yellow: #ff903f;
+
+
+/* 字体大小 */
+$font-size-extra-large: 32px; // 大标题
+$font-size-large: 18px; // 标题
+$font-size-middle: 16px; // 次标题
+$font-size-base: 14px; // 正文内容
+$font-size-small: 12px; //
+
+/* 字体颜色 */
+$color-text-black: #000033; // 黑色文字
+$color-text-primary: #333333; // 主要文字
+$color-text-regular: #666666; // 常规文字：内容
+$color-text-secondary: #999999; // 次要文字
+$color-text-placeholder: #BBBBBB; // 占位文字
+$color-text-blue: #016CFF; // 蓝色文字
+$color-text-white: #ffffff;
+
+/* 边框颜色 */
+$color-border-base: #DDDDDD;
+// 边框
+$color-border-table: #d8d8d8;
+$color-border-2: #E1E0DF;
+$color-border-3: #EBEEF5;
+$color-border-4: #F2F6FC;
+
+
+// 辅助色
+$color-info: #909399;
+$color-success: #67C23A;
+$color-warning: #E6A23C;
+$color-danger: #FF5656;
+
+// 文字
+$color-text-main: #303133;
+$color-text-normal: #606266;
+$color-text-sub: #909399;
+$color-text-placehoder: #C0C4CC;
+
+// 背景
+$bg-color-base: #ECF1F6;
+$bg-color-1: #F2F9FF;
+$table-th-bg: #90939940;
+
+// 按钮
+$color-btn-primary: #11A0FF;
+$color-btn-hover: #016CFF;
+
+@import "public_class";

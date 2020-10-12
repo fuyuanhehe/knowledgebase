@@ -1,0 +1,150 @@
+.menu-box {
+  width: 15%;
+}
+.content-box {
+  width: 82%;
+  margin: 20px 20px 40px 20px;
+  background-color: #ffffff;
+}
+.content {
+  padding: 40px 50px;
+  min-height: 600px;
+}
+.dot-blue {
+  display: block;
+  width:6px;
+  height:6px;
+  margin-right: 15px;
+  background:rgba(41,100,238,1);
+  border-radius:50%;
+}
+.breadcrumb-box {
+  width: 100%;
+  background: $bg-color-base;
+}
+
+//table
+.table-box {
+  .table-th {
+    height:44px;
+    line-height: 44px;
+    padding: 0 !important;
+    color: #333;
+    font-weight: 400;
+    background:rgba(242,249,255,1) !important;
+    border-top: 2px solid #199FF8 !important;
+  }
+  .table-icon {
+    font-size: 18px !important;
+    &:hover,&:focus {
+      color: #018CFE;
+    }
+  }
+  //element:table边框颜色样式重写
+  .el-table td,
+  .el-table th.is-leaf,
+  .el-table--border {
+    border-color: $color-border-table;
+  }
+  .el-table--border::after, .el-table--group::after, .el-table::before {
+    background: $color-border-table;
+  }
+}
+
+//分页
+.pagination-box {
+  margin-top: 30px;
+  text-align: right;
+  button {
+    width: 70px;
+    border: 1px solid #ddd;
+    background: $color-text-white !important;
+    span {
+      font-size: 12px !important;
+    }
+  }
+  .el-pager {
+    .number, .el-icon-more {
+      font-weight: 400;
+      border: 1px solid #ddd;
+      background: $color-text-white !important;
+    }
+    .number.active {
+      background: $color-text-blue !important;
+    }
+  }
+}
+//弹出框中的table
+.el-popover {
+  .el-table {
+    .el-table__header-wrapper{
+      .table-th {
+        background: #F7F4F8;
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+//element:messageBox样式重写
+.el-message-box.el-message-box--center {
+  .el-message-box__header {
+    height: 42px;
+    padding-top: 12px !important;
+    background:rgba(236,242,255,1);
+    .el-message-box__title {
+      span {
+        font-size: $font-size-middle;
+      }
+    }
+  }
+  .el-message-box__content {
+    padding: 30px;
+  }
+  .el-message-box__btns {
+    .el-button {
+      @extend %btn-primary;
+    }
+    .el-button--default {
+      color: $color-btn-primary;
+      border:1px solid rgba(17,160,255,1);
+      &:focus,
+      &:hover {
+        background: #F2F9FF;
+      }
+    }
+    .el-button--primary {
+      color: $color-text-white;
+      background: $color-btn-primary !important;
+      border: none;
+      box-shadow:0 3px 10px 0 rgba(16,60,85,0.17);
+      &:focus,
+      &:hover {
+        color: $color-text-white;
+        background: $color-text-blue;
+      }
+    }
+  }
+}
+
+//element:form样式重写
+.el-form {
+  .el-input, .el-select {
+    width: 260px;
+  }
+  .el-textarea {
+    width: 650px;
+  }
+}
+
+//element:dialog样式重写
+.el-dialog {
+  .el-dialog__header {
+    padding-top: 10px;
+    background:rgba(236,242,255,1);
+    .el-dialog__headerbtn {
+      top: 15px
+    }
+  }
+}
+

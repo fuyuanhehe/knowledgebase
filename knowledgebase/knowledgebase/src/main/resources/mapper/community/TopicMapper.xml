@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.community.mapper.ITopicMapper" >
+    <!--  结果话题扩展map -->
+    <resultMap type="TopicVO" id="topicVOMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="theme" property="theme"/>
+        <result column="content" property="content"/>
+        <result column="circle_id" property="circleId"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="circle_name" property="circleName"/>
+        <result column="create_user_name" property="createUserName"/>
+        <result column="comment_count" property="commentCount"/>
+    </resultMap>
+    
+    <!--  结果基础话题map -->
+    <resultMap type="Topic" id="baseTopicMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+    
+    <!-- 插入话题 -->
+    <insert id="insertTopic" parameterType="Topic">
+        INSERT INTO base_topic
+        ( id, name, circle_id, theme, content, create_user)
+        VALUES
+        ( #{id}, #{name}, #{circleId}, #{theme}, #{content}, #{createUser})
+    </insert>
+    
+    <!-- 根据id删除话题 -->
+    <delete id="deleteTopicById" parameterType="String">
+        DELETE 
+        FROM
+            base_topic 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除话题 -->
+    <delete id="deleteBatchTopicById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            base_topic 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改话题 -->
+    <update id="updateTopic" parameterType="Topic">
+        UPDATE base_topic 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="circleId != null">
+                circle_id = #{circleId},
+            </if>
+            <if test="theme != null">
+                theme = #{theme},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 根据id查询话题 -->
+    <select id="selectTopicById" parameterType="String" resultMap="topicVOMap">
+        SELECT
+            bt.ID,
+            bt.name,
+            bt.circle_id,
+            bt.theme,
+            bt.content,
+            bt.create_time,
+            su.nick_name AS create_user_name
+        FROM
+            base_topic AS bt
+            LEFT JOIN sys_user AS su ON su.name = bt.create_user
+        WHERE
+            bt.id = #{id}
+    </select>
+    
+    <!-- 根据圈子名查询话题 -->
+    <select id="selectTopicByName" parameterType="String" resultMap="baseTopicMap">
+        SELECT
+            id
+        FROM
+            base_topic
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询话题评论列表-->
+    <select id="selectTopicCommentList" parameterType="Topic" resultMap="topicVOMap">
+        SELECT
+            bt.ID,
+            bt.name,
+            bt.theme,
+            bt.create_time,
+            bc.name AS circle_name,
+            su.nick_name AS create_user_name,
+            CASE WHEN buc.count is null THEN 0 ELSE buc.count END AS comment_count
+        FROM
+            base_topic AS bt
+            LEFT JOIN sys_user AS su ON su.name = bt.create_user
+            LEFT JOIN base_circle AS bc ON bc.id = bt.circle_id
+            LEFT JOIN (SELECT count(topic_id),topic_id FROM bus_comment WHERE pid = '0' GROUP BY topic_id) AS buc ON bt.id = buc.topic_id
+        <where>
+            <if test="name != null and name != ''">
+                AND bt.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="circleId != null and circleId != ''">
+                AND bt.circle_id = #{circleId}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND bt.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY
+        <choose>
+            <when test="orderBy == 'count'">
+                 comment_count DESC
+            </when>
+            <when test="orderBy == 'time'">
+                 bt.create_time DESC
+            </when>
+            <otherwise>
+                bt.create_time DESC
+            </otherwise>
+        </choose>
+    </select>
+    
+    <!-- 查询话题列表 -->
+    <select id="selectTopicList" parameterType="Topic" resultMap="topicVOMap">
+        SELECT
+            bt.ID,
+            bt.name,
+            bt.theme,
+            bt.create_time,
+            bt.content,
+            su.nick_name AS create_user_name
+        FROM
+            base_topic AS bt
+            LEFT JOIN sys_user AS su ON su.name = bt.create_user
+        <where>
+            <if test="name != null and name != ''">
+                AND bt.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="circleId != null and circleId != ''">
+                AND bt.circle_id = #{circleId}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND bt.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY bt.create_time DESC
+    </select>
+    
+    <!-- 查询基础话题列表 -->
+    <select id="selectBaseTopicList" parameterType="Topic" resultMap="baseTopicMap">
+        SELECT
+            ID,
+            name
+        FROM
+            base_topic
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="circleId != null and circleId != ''">
+                AND circle_id = #{circleId}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- 查询话题总数 -->
+    <select id="selectTopicCount" resultType="int" parameterType="Topic">
+        SELECT
+            count( id ) 
+        FROM
+            base_topic
+    </select>
+</mapper>

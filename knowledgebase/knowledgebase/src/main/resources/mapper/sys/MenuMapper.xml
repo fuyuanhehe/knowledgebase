@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.sys.mapper.IMenuMapper" >
+    <!--  结果菜单扩展map -->
+    <resultMap type="MenuVO" id="menuMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="pid" property="pid"/>
+        <result column="url" property="url"/>
+        <result column="icon_url" property="iconUrl"/>
+        <result column="reserve" property="reserve"/>
+        <result column="coder" property="coder"/>
+        <result column="pname" property="pname"/>
+        <result column="status" property="status"/>
+        <result column="menu_group" property="menuGroup"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!--  结果基础菜单扩展map -->
+    <resultMap type="Menu" id="baseMenuMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="pid" property="pid"/>
+        <result column="url" property="url"/>
+        <result column="icon_url" property="iconUrl"/>
+        <result column="reserve" property="reserve"/>
+        <result column="menu_group" property="menuGroup"/>
+        <result column="coder" property="coder"/>
+        <result column="status" property="status"/>
+    </resultMap>
+    
+    <!-- 插入菜单 -->
+    <insert id="insertMenu" parameterType="Menu">
+        INSERT INTO sys_menu
+        ( name, id, pid, url, icon_url, reserve, menu_group, create_user)
+        VALUES
+        ( #{name}, #{id}, #{pid}, #{url}, #{iconUrl}, #{reserve}, #{menuGroup}, #{createUser})
+    </insert>
+    
+    <!-- 批量插入菜单 -->
+    <insert id="insertBatchMenu" parameterType="java.util.List">
+        INSERT INTO sys_menu
+        ( name, id, pid, coder, url, icon_url, reserve, menu_group, create_user)
+        VALUES
+        <foreach collection="menus" item="menu" separator="," close=";">
+	        ( #{menu.name}, #{menu.id}, #{menu.pid}, #{menu.coder}, #{menu.url}, 
+	        #{menu.iconUrl}, #{menu.reserve}, #{menuGroup}, #{menu.createUser})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除菜单 -->
+    <delete id="deleteMenuById" parameterType="String">
+        DELETE 
+        FROM
+            sys_menu 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除菜单 -->
+    <delete id="deleteBatchMenuById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            sys_menu 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改菜单 -->
+    <update id="updateMenu" parameterType="Menu">
+        UPDATE sys_menu 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="coder != null">
+                coder = #{coder},
+            </if>
+            <if test="url != null">
+                url = #{url},
+            </if>
+            <if test="iconUrl != null">
+                icon_url = #{iconUrl},
+            </if>
+            <if test="reserve != null">
+                reserve = #{reserve},
+            </if>
+            <if test="menuGroup != null">
+                menu_group = #{menuGroup},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 根据id查询菜单 -->
+    <select id="selectMenuById" parameterType="String" resultMap="menuMap">
+        SELECT
+            sm.id,
+            sm.name,
+            sm.pid,
+            sm.url,
+            sm.icon_url,
+            sm.reserve,
+            sm.menu_group,
+            smp.name AS pname
+        FROM
+            sys_menu AS sm
+        LEFT JOIN sys_menu AS smp ON sm.pid = smp.id
+        WHERE
+            id = #{id}
+    </select>
+    
+    <!-- 根据菜单名查询菜单 -->
+    <select id="selectMenuByName" parameterType="String" resultMap="menuMap">
+        SELECT
+            id
+        FROM
+            sys_menu
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有菜单 -->
+    <select id="selectMenuList" parameterType="Menu" resultMap="menuMap">
+        SELECT
+            sm.id,
+            sm.name,
+            sm.pid,
+            sm.url,
+            sm.icon_url,
+            sm.reserve,
+            sm.menu_group,
+            sm.status,
+            smp.name AS pname 
+        FROM
+            sys_menu AS sm
+            LEFT JOIN sys_menu AS smp ON sm.pid = smp.id
+        <where>
+            <if test="pid != null and pid != ''">
+                AND sm.pid = #{pid}
+            </if>
+            <if test="menuGroup != null and menuGroup != ''">
+                AND sm.menu_group = #{menuGroup}
+            </if>
+            <if test="name != null and name != ''">
+                AND sm.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND sm.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY sm.create_time DESC
+    </select>
+    
+    <!-- 查询基础菜单列表 -->
+    <select id="selectBaseMenuList" parameterType="Menu" resultMap="baseMenuMap">
+        SELECT
+            id,
+            name,
+            pid,
+            url,
+            icon_url,
+            reserve
+        FROM
+            sys_menu
+        <where>
+            status = 1
+            <if test="pid != null and pid != ''">
+                AND pid = #{pid}
+            </if>
+            <if test="menuGroup != null and menuGroup != ''">
+                AND menu_group = #{menuGroup}
+            </if>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- 查询用户菜单列表 -->
+    <select id="selectUserMenuList" parameterType="String" resultMap="baseMenuMap">
+        SELECT
+            sm.id,
+            sm.name,
+            sm.pid,
+            sm.url,
+            sm.icon_url,
+            sm.reserve
+        FROM
+            sys_menu AS sm
+        JOIN sys_role_map_menu AS srmm ON sm.ID = srmm.menu_id
+        JOIN sys_user AS su ON srmm.role_id = su.role_id 
+        WHERE
+            su.NAME = #{userName}
+            AND sm.status = 1
+            <if test="menuGroup != null and menuGroup != ''">
+                AND sm.menu_group = #{menuGroup}
+            </if>
+            <if test="pid != null and pid != ''">
+                AND sm.pid = #{pid}
+            </if>
+         ORDER BY sm.create_time DESC
+    </select>
+    
+    <!-- #########################角色菜单################################# -->
+    <!-- 根据菜单id删除角色菜单 -->
+    <delete id="deleteRoleMenuByMenuId" parameterType="String">
+        DELETE 
+        FROM
+            sys_role_map_menu 
+        WHERE
+            menu_id = #{menuId}
+    </delete>
+    
+    <!-- 根据菜单id批量删除角色菜单 -->
+    <delete id="deleteBatchRoleMenuByMenuId" parameterType="java.util.List">
+        DELETE 
+        FROM
+            sys_role_map_menu 
+        WHERE
+            <foreach collection="menuIds" item="menuId" separator="or">
+                menu_id = #{menuId}
+            </foreach>
+    </delete>
+    
+    <!-- #########################菜单权限关系 #############################-->
+    <!-- 插入菜单权限 -->
+    <insert id="insertMenuPower">
+        INSERT INTO sys_menu_map_power
+        ( menu_id, power_id )
+        VALUES
+        <foreach collection="powerIds" item="powerId" separator=",">
+            ( #{menueId}, #{powerId} )
+        </foreach>
+    </insert>
+    
+    <!-- 根据菜单id删除菜单权限 -->
+    <delete id="deleteMenuPowerByMenuId" parameterType="String">
+        DELETE 
+        FROM
+            sys_menu_map_power 
+        WHERE
+            menu_id = #{menuId}
+    </delete>
+    
+    <!-- 根据菜单id批量删除菜单权限 -->
+    <delete id="deleteBatchMenuPowerByMenuId" parameterType="java.util.List">
+        DELETE 
+        FROM
+            sys_menu_map_power 
+        WHERE
+            <foreach collection="menuIds" item="menuId" separator="or">
+                menu_id = #{menuId}
+            </foreach>
+    </delete>
+</mapper>

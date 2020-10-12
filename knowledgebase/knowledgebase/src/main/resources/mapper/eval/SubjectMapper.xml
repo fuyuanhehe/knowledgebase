@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.eval.mapper.ISubjectMapper" >
+    <!--  结果题目map -->
+    <resultMap type="Subject" id="subjectMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="difficulty" property="difficulty"/>
+        <result column="score" property="score"/>
+        <result column="analysis" property="analysis"/>
+        <result column="options" property="options"/>
+        <result column="answers" property="answers"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!--  结果题目扩展map -->
+    <resultMap type="SubjectVO" id="subjectVOMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="difficulty" property="difficulty"/>
+        <result column="score" property="score"/>
+        <result column="analysis" property="analysis"/>
+        <result column="options" property="options"/>
+        <result column="answers" property="answers"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="difficulty_name" property="difficultyName"/>
+    </resultMap>
+    
+    <!--  结果基础题目扩展map -->
+    <resultMap type="Subject" id="baseSubjectMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+    
+    <!-- 插入题目 -->
+    <insert id="insertSubject" parameterType="Subject">
+        INSERT INTO base_subject
+        ( name, id, type, difficulty, score, analysis, options, answers, create_user)
+        VALUES
+        ( #{name}, #{id}, #{type}, #{difficulty}, #{score}, #{analysis}, 
+        #{options}::jsonb, #{answers}::jsonb, #{createUser})
+    </insert>
+    
+    <!-- 批量插入题目 -->
+    <insert id="insertBatchSubject" parameterType="java.util.List">
+        INSERT INTO base_subject
+        ( name, id, type, difficulty, score, analysis, options, answers, create_user)
+        VALUES
+        <foreach collection="subjects" item="subject" separator="," close=";">
+            ( #{subject.name}, #{subject.id}, #{subject.type}, #{subject.difficulty},
+             #{subject.score}, #{subject.analysis}, #{subject.options}::jsonb, #{subject.answers}::jsonb, #{subject.createUser})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除题目 -->
+    <delete id="deleteSubjectById" parameterType="String">
+        DELETE 
+        FROM
+            base_subject 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除题目 -->
+    <delete id="deleteBatchSubjectById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            base_subject 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改题目 -->
+    <update id="updateSubject" parameterType="Subject">
+        UPDATE base_subject 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="difficulty != null">
+                difficulty = #{difficulty},
+            </if>
+            <if test="score != null">
+                score = #{score},
+            </if>
+            <if test="analysis != null">
+                analysis = #{analysis},
+            </if>
+            <if test="options != null">
+                options = #{options}::jsonb,
+            </if>
+            <if test="answers != null">
+                answers = #{answers}::jsonb,
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 根据id查询题目 -->
+    <select id="selectSubjectById" parameterType="String" resultMap="subjectVOMap">
+        SELECT
+            bs.id,
+            bs.name,
+            bs.type,
+            bs.difficulty,
+            bs.score,
+            bs.analysis,
+            bs.options,
+            bs.answers,
+            sd.name AS difficulty_name
+        FROM
+            base_subject AS bs
+            LEFT JOIN sys_dict AS sd ON bs.difficulty = sd.coder
+        WHERE
+            bs.id = #{id}
+    </select>
+    
+    <!-- 根据标题名查询题目 -->
+    <select id="selectSubjectByName" parameterType="String" resultMap="subjectMap">
+        SELECT
+            id
+        FROM
+            base_subject
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有题目 -->
+    <select id="selectSubjectList" parameterType="Subject" resultMap="subjectVOMap">
+        SELECT
+            bs.id,
+            bs.name,
+            bs.type,
+            bs.difficulty,
+            bs.score,
+            bs.analysis,
+            bs.options,
+            bs.answers,
+            bs.create_time,
+            sd.name AS difficulty_name
+        FROM
+            base_subject AS bs
+            LEFT JOIN sys_dict AS sd ON bs.difficulty = sd.coder
+        <where>
+            <if test="type != null">
+                AND bs.type = #{type}
+            </if>
+            <if test="difficulty != null and difficulty != ''">
+                AND bs.difficulty = #{difficulty}
+            </if>
+            <if test="score != null">
+                AND bs.score = #{score}
+            </if>
+            <if test="name != null and name != ''">
+                AND bs.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND bs.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY bs.create_time DESC
+    </select>
+    
+    <!-- 查询所有基础题目 -->
+    <select id="selectBaseSubjectList" parameterType="Subject" resultMap="baseSubjectMap">
+        SELECT
+            id,
+            NAME
+        FROM
+            base_subject
+        <where>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+   <!--  #################################统计###################################### -->
+    
+    <!--  查询题目总数量 -->
+    <select id="selectSubjectCount" resultType="int" parameterType="Subject">
+        SELECT
+            COUNT(id)
+        FROM
+            base_subject
+        <where>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="difficulty != null and difficulty != ''">
+                AND difficulty = #{difficulty}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+    </select>
+    
+    <!-- 获取题目类型分组 -->
+    <select id="selectSubjectTypeGroup" parameterType="com.hg.knowledgebase.module.stat.bean.StatisticsCondition" resultType="java.util.Map">
+        SELECT
+            sum( CASE WHEN bs.type = 0 THEN count ELSE 0 END ) AS "单选",
+            sum( CASE WHEN bs.type = 1 THEN count ELSE 0 END ) AS "多选",
+            sum( CASE WHEN bs.type = 2 THEN count ELSE 0 END ) AS "判断"
+        FROM
+            ( 
+            SELECT type, count( 1 ) FROM base_subject
+            <where>
+                <if test="beginTime != null and endTime != null">
+                    AND to_char(create_time, 'YYYY-MM-DD') BETWEEN #{beginTime} AND #{endTime}
+                </if>
+            </where>
+            GROUP BY type 
+            ) AS bs
+    </select>
+    
+    <!-- 查询题目统计列表 -->
+    <select id="selectSubjectStatList" resultType="com.hg.knowledgebase.module.stat.bean.StatisticsCondition" parameterType="com.hg.knowledgebase.module.stat.bean.StatisticsCondition">
+        SELECT
+            <choose>
+                <!-- 年统计 -->
+                <when test="type == 'year'">
+                    to_char ( create_time, 'YYYY' ) AS data,
+                </when>
+                <!-- 月、半年、季度 统计 -->
+                <when test="type == 'month' or type == 'half_year' or type == 'quarter'">
+                    to_char ( create_time, 'YYYY-MM' ) AS data, 
+                </when>
+                <!-- 日、周统计 -->
+                <when test="type == 'day' or type == 'week'">
+                    to_char ( create_time, 'YYYY-MM-DD' ) AS data,
+                </when>
+                <!-- 自定义统计 -->
+                <when test="type == 'custom'">
+                    <choose>
+                        <when test="customType == 1">
+                            to_char ( create_time, 'YYYY' ) AS data,
+                        </when>
+                        <when test="customType == 2">
+                            to_char ( create_time, 'YYYY-MM' ) AS data,
+                        </when>
+                        <when test="customType == 3">
+                            to_char ( create_time, 'YYYY-MM-DD' ) AS data,
+                        </when>
+                    </choose>
+                </when>
+            </choose>
+            count( 1 ) AS count
+        FROM
+            base_subject
+        <where>
+            <if test="otherCondition != null">
+                <if test="otherCondition.containsKey('subjectType') and otherCondition.subjectType != null and otherCondition.subjectType != ''">
+                    AND type = #{otherCondition.subjectType}
+                </if>
+            </if>
+            <choose>
+                <!-- 年统计 -->
+                <when test="type == 'year'">
+                    AND to_char(create_time, 'YYYY') BETWEEN #{beginTime} AND #{endTime}
+                </when>
+                <!-- 月、半年、季度统计 -->
+                <when test="type == 'month' or type == 'half_year' or type == 'quarter'">
+                    AND to_char(create_time, 'YYYY-MM') BETWEEN #{beginTime} AND #{endTime}
+                </when>
+                <!-- 日、周统计 -->
+                <when test="type == 'day' or type == 'week'">
+                    AND to_char(create_time, 'YYYY-MM-DD') BETWEEN #{beginTime} AND #{endTime}
+                </when>
+                <!-- 自定义统计 -->
+                <when test="type == 'custom'">
+                    <choose>
+                        <when test="customType == 1">
+                            AND to_char(create_time, 'YYYY') BETWEEN #{beginTime} AND #{endTime}
+                        </when>
+                        <when test="customType == 2">
+                            AND to_char(create_time, 'YYYY-MM') BETWEEN #{beginTime} AND #{endTime}
+                        </when>
+                        <when test="customType == 3">
+                            AND to_char(create_time, 'YYYY-MM-DD') BETWEEN #{beginTime} AND #{endTime}
+                        </when>
+                    </choose>
+                </when>
+            </choose>
+        </where>
+        GROUP BY
+            create_time
+    </select>
+</mapper>

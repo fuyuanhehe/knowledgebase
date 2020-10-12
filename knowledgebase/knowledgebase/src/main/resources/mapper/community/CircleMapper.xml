@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.community.mapper.ICircleMapper" >
+    <!--  结果圈子扩展map -->
+    <resultMap type="Circle" id="circleMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!--  结果基础圈子扩展map -->
+    <resultMap type="Circle" id="baseCircleMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+    
+    <!-- 插入圈子 -->
+    <insert id="insertCircle" parameterType="Circle">
+        INSERT INTO base_circle
+        ( name, id, create_user)
+        VALUES
+        ( #{name}, #{id}, #{createUser})
+    </insert>
+    
+    <!-- 批量插入圈子 -->
+    <insert id="insertBatchCircle" parameterType="java.util.List">
+        INSERT INTO base_circle
+        ( name, id, create_user)
+        VALUES
+        <foreach collection="circles" item="circle" separator="," close=";">
+	        ( #{circle.name}, #{circle.id}, #{circle.createUser})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除圈子 -->
+    <delete id="deleteCircleById" parameterType="String">
+        DELETE 
+        FROM
+            base_circle 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除圈子 -->
+    <delete id="deleteBatchCircleById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            base_circle 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改圈子 -->
+    <update id="updateCircle" parameterType="Circle">
+        UPDATE base_circle 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 根据id查询圈子 -->
+    <select id="selectCircleById" parameterType="String" resultMap="circleMap">
+        SELECT
+            ID,
+            NAME
+        FROM
+            base_circle
+        WHERE
+            id = #{id}
+    </select>
+    
+    <!-- 根据圈子名查询圈子 -->
+    <select id="selectCircleByName" parameterType="String" resultMap="circleMap">
+        SELECT
+            id
+        FROM
+            base_circle
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有圈子 -->
+    <select id="selectCircleList" parameterType="Circle" resultMap="circleMap">
+        SELECT
+            id,
+            NAME,
+            create_time
+        FROM
+            base_circle
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- 查询所有基础圈子 -->
+    <select id="selectBaseCircleList" parameterType="Circle" resultMap="baseCircleMap">
+        SELECT
+            id,
+            NAME
+        FROM
+            base_circle
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- 查询圈子总数 -->
+    <select id="selectCircleCount" resultType="int" parameterType="Circle">
+        SELECT
+            count( id ) 
+        FROM
+            base_circle
+    </select>
+
+
+
+</mapper>

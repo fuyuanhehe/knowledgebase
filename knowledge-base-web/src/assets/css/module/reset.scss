@@ -1,0 +1,115 @@
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  vertical-align: baseline;
+  background: transparent;
+  font-family: 'Microsoft Yahei', 'simsun', 'arial', 'tahoma', serif;
+}
+
+h1, h2, h3, h4, h5, h6, em, i {
+  font-weight: 400;
+}
+
+ul, ol, li {
+  list-style-type: none
+}
+
+a {
+  color: #409EFF;
+  text-decoration: none;
+  outline: 0
+}
+
+a:hover {
+  text-decoration: none
+}
+
+* {
+  box-sizing: border-box;
+}
+/* 重置表单元素 *//* for ie6 */
+legend {
+  color: #000;
+}
+
+/* img 搭车：让链接里的 img 无边框 */
+fieldset, img {
+  border: none;
+}
+
+/* 注：optgroup 无法扶正 */
+button, input, select, textarea {
+  font-size: 100%; /* 使得表单元素在 ie 下能继承字体大小 */
+  outline: none;
+  border:none;
+}
+/* 去除button、input默认样式(边框) */
+button,input[type='button'] {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: none;
+}
+button:focus, input[type='button']:focus {
+  outline:none !important;
+}
+/*Firefox*/
+input::-moz-focus-inner, button::-moz-focus-inner {
+  border: 0 !important;
+}
+input {
+  padding: 0 10px;
+}
+
+/* 重置 hr */
+hr {
+  border: none;
+  height: 1px;
+}
+
+/* 让非ie浏览器默认也显示垂直滚动条，防止因滚动条引起的闪烁 */
+html {
+  overflow-y: scroll;
+}
+
+/* 将斜体扶正 */
+address, cite, dfn, em, var, i {
+  font-style: normal;
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0;
+}
+
+/*在firefox下移除input[number]的上下箭头*/
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.clear-all-style {
+  * {
+    background: none !important;
+    font-family: normal !important;
+    font-size: initial !important;
+    width: auto !important;
+    line-height: normal !important;
+    border: none !important;
+    text-indent: initial !important;
+  }
+
+}

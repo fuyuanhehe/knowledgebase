@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.proj.mapper.IProjectMapper" >
+    <!--  结果项目扩展map -->
+    <resultMap type="ProjectVO" id="projectVOMap">
+
+        <id column="id" property="id"/>
+
+        <result column="examine_status" property="examineStatus"/>
+        <result column="examine_msg" property="examineMsg"/>
+        <result column="charge_person" property="chargePerson"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="total_money" property="totalMoney"/>
+        <result column="begin_date" property="beginDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="term" property="term"/>
+        <result column="status" property="status"/>
+        <result column="introduction" property="introduction"/>
+        <result column="customer" property="customer"/>
+        <result column="conscientious_user" property="conscientiousUser"/>
+        <result column="landline" property="landline"/>
+        <result column="phone" property="phone"/>
+        <result column="customer_addr" property="customerAddr"/>
+        <result column="enclosures" property="enclosures"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="stage" property="stage"/>
+        <result column="revoke_time" property="revokeTime"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="proc_id" property="procId"/>
+        <result column="risk_description" property="riskDescription"/>
+        <result column="create_user_nick" property="createUserNick"/>
+    </resultMap>
+
+    <!--  结果项目扩展map -->
+    <resultMap type="ProjectVO" id="projectVOMap2">
+        <id column="id" property="id"/>
+
+        <id column="charge_person" property="chargePerson"/>
+        <result column="examine_status" property="examineStatus"/>
+        <result column="examine_msg" property="examineMsg"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="total_money" property="totalMoney"/>
+        <result column="begin_date" property="beginDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="term" property="term"/>
+        <result column="status" property="status"/>
+        <result column="introduction" property="introduction"/>
+        <result column="customer" property="customer"/>
+        <result column="conscientious_user" property="conscientiousUser"/>
+        <result column="landline" property="landline"/>
+        <result column="phone" property="phone"/>
+        <result column="customer_addr" property="customerAddr"/>
+        <result column="enclosures" property="enclosures"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="stage" property="stage"/>
+        <result column="revoke_time" property="revokeTime"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="risk_description" property="riskDescription"/>
+        <result column="proc_id" property="procId"/>
+        <result column="create_user_nick" property="createUserNick"/>
+
+        <collection property="participatePerson" column="id" javaType="java.util.List" ofType="java.util.Map" select="selectUserProjectByProjectId"></collection>
+        <collection property="duplicatePerson" column="id" javaType="java.util.List" ofType="java.util.Map" select="selectUserProjectByProjectId2"></collection>
+    </resultMap>
+
+    <!--  结果基础项目扩展map -->
+    <resultMap type="Project" id="baseProjectMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+
+    <!--  结果用户项目扩展map -->
+    <resultMap type="UserProjectVO" id="userProjectVOMap">
+        <result column="user_id" property="userId"/>
+        <result column="project_id" property="projectId"/>
+        <result column="type" property="type"/>
+        <result column="project_name" property="projectName"/>
+    </resultMap>
+
+    <!-- 插入项目 -->
+    <insert id="insertProject" parameterType="Project">
+        INSERT INTO bus_project
+        (  charge_person,examine_status,examine_msg, name, id, type, total_money, begin_date, end_date, term, status, introduction, customer,
+        conscientious_user, phone, landline, customer_addr, enclosures, risk_description, proc_id, create_user)
+        VALUES
+        ( #{chargePerson},#{examineStatus} , #{examineMsg},
+         #{name}, #{id}, #{type}, #{totalMoney}, #{beginDate}, #{endDate}, #{term}, #{status},
+        #{introduction}, #{customer}, #{conscientiousUser}, #{phone}, #{landline}, #{customerAddr},
+        #{enclosures}::jsonb, #{riskDescription}, #{procId}, #{createUser})
+    </insert>
+
+    <!-- 批量插入项目 -->
+    <insert id="insertBatchProject" parameterType="java.util.List">
+        INSERT INTO bus_project
+        (charge_person,examine_status,examine_msg, name, id, type, total_money, begin_date, end_date, term, status, introduction, customer,
+        conscientious_user, phone, landline, customer_addr, enclosures, risk_description, create_user)
+        VALUES
+        <foreach collection="projects" item="project" separator="," close=";">
+	        (  #{chargePerson}, #{examineStatus} , #{examineMsg},
+	         #{project.name}, #{project.id}, #{project.type}, #{project.totalMoney}, #{project.beginDate},
+	        #{project.endDate}, #{project.term}, #{project.status}, #{project.introduction}, #{project.customer},
+	        #{project.project.conscientiousUser}, #{project.phone}, #{project.landline}, #{project.customerAddr},
+	        #{project.enclosures}::jsonb, #{project.riskDescription}, #{project.createUser})
+        </foreach>
+    </insert>
+
+    <!-- 根据id删除项目 -->
+    <delete id="deleteProjectById" parameterType="String">
+        DELETE
+		FROM
+		    bus_project
+		WHERE
+		    id = #{id}
+    </delete>
+
+    <!-- 根据id批量删除项目 -->
+    <delete id="deleteBatchProjectById" parameterType="java.util.List">
+        DELETE
+        FROM
+            bus_project
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+
+    <!-- 修改项目 -->
+    <update id="updateProject" parameterType="Project">
+        UPDATE bus_project
+        SET
+        <trim suffixOverrides=",">
+
+            <if test="chargePerson != null">
+                charge_person = #{chargePerson},
+            </if>
+
+            <if test="examineStatus != null">
+                examine_status = #{examineStatus},
+            </if>
+            <if test="examineMsg != null">
+                examine_msg = #{examineMsg},
+            </if>
+
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="totalMoney != null">
+                total_money = #{totalMoney},
+            </if>
+            <if test="beginDate != null">
+                begin_date = #{beginDate},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate},
+            </if>
+            <if test="term != null">
+                term = #{term},
+            </if>
+            <if test="status != null">
+                term = #{status},
+            </if>
+            <if test="introduction != null">
+                introduction = #{introduction},
+            </if>
+            <if test="customer != null">
+                customer = #{customer},
+            </if>
+            <if test="conscientiousUser != null">
+                conscientious_user = #{conscientiousUser},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="landline != null">
+                landline = #{landline},
+            </if>
+            <if test="customerAddr != null">
+                customer_addr = #{customerAddr},
+            </if>
+            <if test="enclosures != null">
+                enclosures = #{enclosures},
+            </if>
+            <if test="procId != null">
+                proc_id = #{procId},
+            </if>
+            <if test="riskDescription != null">
+                risk_description = #{riskDescription},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+		WHERE
+		    id = #{id}
+    </update>
+
+    <!-- 根据id查询项目 -->
+    <select id="selectProjectById" parameterType="String" resultMap="projectVOMap2">
+        SELECT
+            bp.id,
+            bp.name,
+            bp.type,
+            bp.total_money,
+            bp.begin_date,
+            bp.end_date,
+            bp.term,
+            bp.status,
+            bp.introduction,
+            bp.customer,
+            bp.conscientious_user,
+            bp.phone,
+            bp.landline,
+            bp.customer_addr,
+            bp.enclosures,
+            bp.proc_id,
+            bp.risk_description,
+            bp.examine_status,
+               bp.examine_msg,
+               bp.charge_person,
+
+            su.nick_name AS create_user_nick
+        FROM
+            bus_project AS bp
+            LEFT JOIN sys_user AS su ON bp.create_user = su.name
+        WHERE
+            bp.id = #{id}
+    </select>
+
+    <!-- 根据标题名查询项目 -->
+    <select id="selectProjectByName" parameterType="String" resultMap="projectVOMap">
+        SELECT
+            id
+        FROM
+            bus_project
+        WHERE
+            name = #{name}
+    </select>
+
+    <!-- 查询所有项目 -->
+    <select id="selectProjectList" parameterType="Project" resultMap="projectVOMap">
+        SELECT
+            bp.id,
+            bp.name,
+            bp.type,
+            bp.status,
+            bp.stage,
+            bp.create_time,
+            bp.revoke_time,
+            bp.audit_time,
+        bp.examine_status,
+        bp.examine_msg,
+               bp.charge_person,
+            su.nick_name AS create_user_nick
+        FROM
+            bus_project AS bp
+            LEFT JOIN sys_user AS su ON bp.create_user = su.name
+        <where>
+            <if test="chargePerson != null">
+                AND bp.charge_person = #{chargePerson}
+            </if>
+            <if test="examineStatus != null">
+                AND bp.examine_status = #{examineStatus}
+            </if>
+            <if test="examineMsg != null">
+                AND bp.examine_msg = #{examineMsg}
+            </if>
+            <if test="type != null">
+                AND bp.type = #{type}
+            </if>
+            <if test="status != null">
+                AND bp.status = #{status}
+            </if>
+            <if test="name != null and name != ''">
+                AND bp.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND bp.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY bp.create_time DESC
+    </select>
+
+    <!-- 查询所有基础项目 -->
+    <select id="selectBaseProjectList" parameterType="Project" resultMap="baseProjectMap">
+        SELECT
+            id,
+            NAME
+        FROM
+            bus_project
+        <where>
+
+            <if test="chargePerson != null">
+                AND charge_person = #{chargePerson}
+            </if>
+
+            <if test="examineStatus != null">
+                AND examine_status = #{examineStatus}
+            </if>
+            <if test="examineMsg != null">
+                AND examine_msg = #{examineMsg}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- #########################用户项目关系 #############################-->
+    <!-- 插入用户项目 -->
+    <insert id="insertUserProject">
+        INSERT INTO bus_user_map_project
+        ( user_id, type, project_id )
+        VALUES
+        <foreach collection="userIds" item="userId" separator=",">
+            ( #{userId}, #{type}, #{projectId} )
+        </foreach>
+    </insert>
+
+    <!-- 删除用户项目 -->
+    <delete id="deleteUserProject" parameterType="UserProject">
+        DELETE
+        FROM
+            bus_user_map_project
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="projectId != null">
+                AND project_id = #{projectId}
+            </if>
+        </where>
+    </delete>
+
+    <!-- 根据项目id批量删除用户项目 -->
+    <delete id="deleteBatchUserProjectByProjectId" parameterType="java.util.List">
+        DELETE
+        FROM
+            bus_user_map_project
+        <where>
+                <foreach collection="projectIds" item="projectId" separator="or">
+                    project_id = #{projectId}
+                </foreach>
+        </where>
+    </delete>
+
+    <!-- 根据用户id批量删除用户项目 -->
+    <delete id="deleteBatchUserProjectByUserId" parameterType="java.util.List">
+        DELETE
+        FROM
+            bus_user_map_project
+        <where>
+                <foreach collection="userIds" item="userId" separator="or">
+                    user_id = #{userId}
+                </foreach>
+        </where>
+    </delete>
+
+    <!--  查询所有用户项目 -->
+    <!-- <select id="selectPowerList" parameterType="UserProject" resultMap="basePowerMap">
+        SELECT
+            sm.id,
+            sm.name,
+            sm.coder,
+            sm.menu_id
+        FROM
+            sys_power AS sp
+        JOIN bus_user_map_project AS srmp ON sp.id = srmp.role_id
+        WHERE
+            srmp.project_id = #{projectId}
+    </select> -->
+
+    <!-- 根据用户id查询用户项目列表 -->
+    <select id="selectUserProjectByUserId" parameterType="java.util.List" resultMap="userProjectVOMap">
+        SELECT
+            bump.user_id,
+            bump.project_id,
+            bump.type,
+            bp.name AS project_name
+        FROM
+            bus_user_map_project as bump
+            JOIN bus_project AS bp ON bp.id = bump.project_id
+        <where>
+                <foreach collection="userIds" item="userId" separator="or">
+                    user_id = #{userId}
+                </foreach>
+        </where>
+    </select>
+
+    <!-- 根据项目id查询用户项目  -->
+    <select id="selectUserProjectByProjectId" parameterType="String" resultType="java.util.Map">
+
+        SELECT
+        u.id,
+        u.nick_name
+        FROM
+        bus_user_map_project b
+        LEFT JOIN sys_user u ON b.user_id = u.id
+
+        WHERE
+            b.project_id = #{id}
+          and  b.type = 0
+    </select>
+
+    <!-- 根据项目id查询用户项目  -->
+    <select id="selectUserProjectByProjectId2" parameterType="String" resultType="java.util.Map">
+
+        SELECT
+        u.id,
+        u.nick_name
+        FROM
+        bus_user_map_project b
+        LEFT JOIN sys_user u ON b.user_id = u.id
+
+        WHERE
+        b.project_id = #{id}
+       and  b.type = 1
+    </select>
+
+
+</mapper>

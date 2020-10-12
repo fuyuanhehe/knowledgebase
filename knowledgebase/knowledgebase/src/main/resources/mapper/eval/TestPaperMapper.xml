@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.eval.mapper.ITestPaperMapper" >
+    <!--  结果试卷扩展map -->
+    <resultMap type="TestPaper" id="test_paperMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="subjects" property="subjects"/>
+        <result column="total_score" property="totalScore"/>
+        <result column="total_num" property="totalNum"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!--  结果基础试卷扩展map -->
+    <resultMap type="TestPaper" id="baseTestPaperMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+    
+    <!-- 插入试卷 -->
+    <insert id="insertTestPaper" parameterType="TestPaper">
+        INSERT INTO base_test_paper
+        ( name, id, total_num, total_score, subjects, create_user)
+        VALUES
+        ( #{name}, #{id}, #{totalNum}, #{totalScore}, #{subjects}::jsonb, #{createUser})
+    </insert>
+    
+    <!-- 批量插入试卷 -->
+    <insert id="insertBatchTestPaper" parameterType="java.util.List">
+        INSERT INTO base_test_paper
+        ( name, id, total_num, total_score, subjects, create_user)
+        VALUES
+        <foreach collection="testPapers" item="testPaper" separator="," close=";">
+            ( #{testPaper.name}, #{testPaper.id}, #{testPaper.totalNum}, 
+            #{testPaper.totalScore}, #{testPaper.subjects}::jsonb, #{testPaper.createUser})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除试卷 -->
+    <delete id="deleteTestPaperById" parameterType="String">
+        DELETE 
+        FROM
+            base_test_paper 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除试卷 -->
+    <delete id="deleteBatchTestPaperById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            base_test_paper 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改试卷 -->
+    <update id="updateTestPaper" parameterType="TestPaper">
+        UPDATE base_test_paper 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="subjects != null">
+                subjects = #{subjects}::jsonb,
+            </if>
+            <if test="totalScore != null">
+                total_score = #{totalScore},
+            </if>
+            <if test="totalNum != null">
+                total_num = #{totalNum},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 根据id查询试卷 -->
+    <select id="selectTestPaperById" parameterType="String" resultMap="test_paperMap">
+        SELECT
+            id,
+            name,
+            total_score,
+            total_num,
+            subjects
+        FROM
+            base_test_paper
+        WHERE
+            id = #{id}
+    </select>
+    
+    <!-- 根据标题名查询试卷 -->
+    <select id="selectTestPaperByName" parameterType="String" resultMap="test_paperMap">
+        SELECT
+            id
+        FROM
+            base_test_paper
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有试卷 -->
+    <select id="selectTestPaperList" parameterType="TestPaper" resultMap="test_paperMap">
+        SELECT
+            id,
+            name,
+            total_score,
+            total_num,
+            subjects,
+            create_time
+        FROM
+            base_test_paper
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- 查询所有基础试卷 -->
+    <select id="selectBaseTestPaperList" parameterType="TestPaper" resultMap="baseTestPaperMap">
+        SELECT
+            id,
+            NAME
+        FROM
+            base_test_paper
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!--  查询试卷总数量 -->
+    <select id="selectTestPaperCount" resultType="int" parameterType="TestPaper">
+        SELECT
+            COUNT(id)
+        FROM
+            base_test_paper
+        <where>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+    </select>
+</mapper>

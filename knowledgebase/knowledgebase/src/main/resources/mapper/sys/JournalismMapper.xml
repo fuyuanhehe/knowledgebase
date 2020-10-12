@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.sys.mapper.IJournalismMapper" >
+    <!--  结果新闻扩展map -->
+    <resultMap type="JournalismVO" id="journalismVOMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="introduction" property="introduction"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="user_name" property="userName"/>
+    </resultMap>
+    
+    <!--  结果基础新闻扩展map -->
+    <resultMap type="Journalism" id="journalismMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="introduction" property="introduction"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!-- 插入新闻 -->
+    <insert id="insertJournalism" parameterType="Journalism">
+        INSERT INTO base_journalism
+        ( name, id, introduction, create_user)
+        VALUES
+        ( #{name}, #{id}, #{introduction}, #{createUser})
+    </insert>
+    
+    <!-- 批量插入新闻 -->
+    <insert id="insertBatchJournalism" parameterType="java.util.List">
+        INSERT INTO base_journalism
+        ( name, id, introduction, create_user)
+        VALUES
+        <foreach collection="journalisms" item="journalism" separator="," close=";">
+	        ( #{journalism.name}, #{journalism.id}, #{journalism.introduction}, #{journalism.createUser})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除新闻 -->
+    <delete id="deleteJournalismById" parameterType="String">
+        DELETE 
+        FROM
+            base_journalism 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除新闻 -->
+    <delete id="deleteBatchJournalismById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            base_journalism 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改新闻 -->
+    <update id="updateJournalism" parameterType="Journalism">
+        UPDATE base_journalism 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="introduction != null">
+                introduction = #{introduction},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 根据id查询新闻 -->
+    <select id="selectJournalismById" parameterType="String" resultMap="journalismMap">
+        SELECT
+            id,
+            name,
+            introduction,
+            create_time
+        FROM
+            base_journalism
+        WHERE
+            id = #{id}
+    </select>
+    
+    <!-- 根据新闻名查询新闻 -->
+    <select id="selectJournalismByName" parameterType="String" resultMap="journalismVOMap">
+        SELECT
+            id
+        FROM
+            base_journalism
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有新闻 -->
+    <select id="selectJournalismList" parameterType="Journalism" resultMap="journalismVOMap">
+        SELECT
+            bj.id,
+            bj.name,
+            bj.introduction,
+            bj.create_time,
+            su.nick_name AS user_name
+        FROM
+            base_journalism AS bj
+            LEFT JOIN sys_user AS su ON su.name = bj.create_user
+        <where>
+            <if test="name != null and name != ''">
+                AND bj.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND bj.create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY bj.create_time DESC
+    </select>
+</mapper>

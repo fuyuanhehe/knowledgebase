@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.eval.mapper.ICurriculumMapper" >
+    <!--  结果课程扩展map -->
+    <resultMap type="Curriculum" id="curriculumMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="cover_url" property="coverUrl"/>
+        <result column="introduction" property="introduction"/>
+        <result column="resources" property="resources"/>
+        <result column="learn_begin_time" property="learnBeginTime"/>
+        <result column="learn_end_time" property="learnEndTime"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!--  结果课程扩展map -->
+    <resultMap type="CurriculumVO" id="curriculumVOMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="status" property="status"/>
+        <result column="cover_url" property="coverUrl"/>
+        <result column="introduction" property="introduction"/>
+        <result column="resources" property="resources"/>
+        <result column="learn_begin_time" property="learnBeginTime"/>
+        <result column="learn_end_time" property="learnEndTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <collection property="userIds" column="id" javaType="java.util.Set" ofType="String" select="selectUserCurriculumByCurriculumId"></collection>
+    </resultMap>
+    
+    <!--  结果基础课程扩展map -->
+    <resultMap type="Curriculum" id="baseCurriculumMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+    
+    <!-- 结果用户课程map -->
+    <resultMap type="UserCurriculumVO" id="userCurriculumVOMap">
+        <result column="user_id" property="userId"/>
+        <result column="curriculum_id" property="curriculumId"/>
+        <result column="progress" property="progress"/>
+        <result column="curriculum_name" property="curriculumName"/>
+        <result column="curriculum_cover_url" property="curriculumCoverUrl"/>
+        <result column="curriculum_introduction" property="curriculumIntroduction"/>
+        <result column="curriculum_resources" property="curriculumResources"/>
+        <result column="learn_begin_time" property="learnBeginTime"/>
+        <result column="learn_end_time" property="learnEndTime"/>
+        <result column="user_count" property="userCount"/>
+        <result column="status" property="status"/>
+        <result column="learn_time" property="learnTime"/>
+        <result column="learn_record" property="learnRecord"/>
+        <result column="complete_status" property="completeStatus"/>
+    </resultMap>
+    
+    <!-- 插入课程 -->
+    <insert id="insertCurriculum" parameterType="Curriculum">
+        INSERT INTO base_curriculum
+        ( name, id, cover_url, introduction, resources, learn_begin_time, learn_end_time, create_user)
+        VALUES
+        ( #{name}, #{id}, #{coverUrl}, #{introduction}, #{resources}::jsonb, #{learnBeginTime}, #{learnEndTime}, #{createUser})
+    </insert>
+    
+    <!-- 批量插入课程 -->
+    <insert id="insertBatchCurriculum" parameterType="java.util.List">
+        INSERT INTO base_curriculum
+        ( name, id, cover_url, introduction, resources, learn_begin_time, learn_end_time, create_user)
+        VALUES
+        <foreach collection="curriculums" item="curriculum" separator="," close=";">
+            ( #{curriculum.name}, #{curriculum.id}, #{curriculum.coverUrl}, #{curriculum.introduction}, 
+            #{curriculum.resources}::jsonb, #{curriculum.createUser}, #{curriculum.learnBeginTime}, #{curriculum.learnEndTime})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除课程 -->
+    <delete id="deleteCurriculumById" parameterType="String">
+        DELETE 
+        FROM
+            base_curriculum 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除课程 -->
+    <delete id="deleteBatchCurriculumById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            base_curriculum 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改课程 -->
+    <update id="updateCurriculum" parameterType="Curriculum">
+        UPDATE base_curriculum 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="coverUrl != null">
+                cover_url = #{coverUrl},
+            </if>
+            <if test="introduction != null">
+                introduction = #{introduction},
+            </if>
+            <if test="resources != null">
+                resources = #{resources}::jsonb,
+            </if>
+            <if test="learnBeginTime != null">
+                learn_begin_time = #{learnBeginTime},
+            </if>
+            <if test="learnEndTime != null">
+                learn_end_time = #{learnEndTime},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+    
+    <!-- 批量更新课程状态 -->
+    <update id="updateBatchCurriculumStatus">
+        UPDATE base_curriculum 
+        SET
+            status = #{status} 
+        <where>
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+        </where>
+    </update>
+    
+    <!-- 根据id查询课程 -->
+    <select id="selectCurriculumById" parameterType="String" resultMap="curriculumVOMap">
+        SELECT
+            id,
+            name,
+            status,
+            cover_url,
+            introduction,
+            learn_begin_time,
+            learn_end_time,
+            resources
+        FROM
+            base_curriculum
+        WHERE
+            id = #{id}
+    </select>
+    
+    <!-- 根据标题名查询课程 -->
+    <select id="selectCurriculumByName" parameterType="String" resultMap="curriculumMap">
+        SELECT
+            id
+        FROM
+            base_curriculum
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有课程 -->
+    <select id="selectCurriculumList" parameterType="Curriculum" resultMap="curriculumMap">
+        SELECT
+            id,
+            name,
+            cover_url,
+            status,
+            learn_begin_time,
+            learn_end_time,
+            create_time
+        FROM
+            base_curriculum
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- 查询所有基础课程 -->
+    <select id="selectBaseCurriculumList" parameterType="Curriculum" resultMap="baseCurriculumMap">
+        SELECT
+            id,
+            NAME,
+            status
+        FROM
+            base_curriculum
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} and #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- 查询所有基础学习课程 -->
+    <select id="selectBaseLearnCurriculumList" parameterType="Curriculum" resultType="String">
+        SELECT
+            id
+        FROM
+            base_curriculum
+        <where>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="learnBeginTime != null">
+                AND #{learnBeginTime} <![CDATA[ >= ]]> learn_begin_time
+            </if>
+            <if test="learnEndTime != null">
+                AND #{learnEndTime} <![CDATA[ >= ]]> learn_end_time
+            </if>
+        </where>
+    </select>
+    
+    <!--  查询课程总数量 -->
+    <select id="selectCurriculumCount" resultType="int" parameterType="Curriculum">
+        SELECT
+            COUNT(id)
+        FROM
+            base_curriculum
+            <where>
+	            <if test="beginCreateTime != null and endCreateTime != null">
+	                AND create_time BETWEEN #{beginCreateTime} and #{endCreateTime}
+	            </if>
+            </where>
+    </select>
+    
+    <!-- #########################用户课程关系 #############################-->
+    <!-- 插入用户课程 -->
+    <insert id="insertUserCurriculum">
+        INSERT INTO bus_user_map_curriculum
+        (user_id, curriculum_id )
+        VALUES
+        <foreach collection="userIds" item="userId" separator=",">
+            (#{userId}, #{curriculumId} )
+        </foreach>
+    </insert>
+    
+    <!-- 更新用户课程 -->
+    <update id="updateUserCurriculum" parameterType="UserCurriculum">
+        UPDATE bus_user_map_curriculum 
+        SET 
+        <trim suffixOverrides=",">
+            <if test="progress != null">
+                progress = #{progress},
+            </if>
+            <if test="completeStatus != null">
+                complete_status = #{completeStatus},
+            </if>
+            <if test="learnRecord != null">
+                learn_record = #{learnRecord}::jsonb,
+            </if>
+            <if test="learnTime != null">
+                learn_time = #{learnTime},
+            </if>
+        </trim>
+        WHERE user_id = #{userId} AND curriculum_id = #{curriculumId}
+    </update>
+    
+    <!-- 删除用户课程 -->
+    <delete id="deleteUserCurriculum" parameterType="UserCurriculum">
+        DELETE 
+        FROM
+            bus_user_map_curriculum 
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="curriculumId != null">
+                AND curriculum_id = #{curriculumId}
+            </if>
+        </where>
+    </delete>
+    
+    <!-- 根据课程id批量删除用户课程 -->
+    <delete id="deleteBatchUserCurriculumByCurriculumId" parameterType="java.util.Set">
+        DELETE 
+        FROM
+            bus_user_map_curriculum 
+        <where>
+                <foreach collection="curriculumIds" item="curriculumId" separator="or">
+                    curriculum_id = #{curriculumId}
+                </foreach>
+        </where>
+    </delete>
+    
+    <!-- 根据用户id批量删除用户课程 -->
+    <delete id="deleteBatchUserCurriculumByUserId" parameterType="java.util.List">
+        DELETE 
+        FROM
+            bus_user_map_curriculum 
+        <where>
+                <foreach collection="userIds" item="userId" separator="or">
+                    user_id = #{userId}
+                </foreach>
+        </where>
+    </delete>
+    
+    <!-- 查询用户课程 -->
+    <select id="selectUserCurriculum" parameterType="UserCurriculum" resultMap="userCurriculumVOMap">
+        SELECT
+            bumc.progress,
+            bumc.learn_time,
+            bumc.learn_record,
+            bumc.complete_status,
+            bumc.user_id,
+            bumc.curriculum_id,
+            bc.NAME AS curriculum_name,
+            bc.cover_url AS curriculum_cover_url,
+            bc.introduction AS curriculum_introduction,
+            bc.resources AS curriculum_resources,
+            bc.learn_begin_time,
+            bc.learn_end_time,
+        CASE
+        WHEN bumcc.count IS NULL THEN
+            0 ELSE bumcc.count 
+            END AS user_count 
+        FROM
+            bus_user_map_curriculum AS bumc
+            JOIN base_curriculum AS bc ON bc.id = bumc.curriculum_id
+            JOIN ( SELECT curriculum_id, count( curriculum_id ) FROM bus_user_map_curriculum GROUP BY curriculum_id ) AS bumcc ON bumcc.curriculum_id = bumc.curriculum_id
+        WHERE
+            bumc.user_id = #{userId}
+            AND bumc.curriculum_id = #{curriculumId}
+    </select>
+    
+    <!--  根据用户获取用户课程列表 -->
+    <select id="selectUserCurriculumList" parameterType="UserCurriculumVO" resultMap="userCurriculumVOMap">
+        SELECT
+            bumc.user_id,
+            bumc.curriculum_id,
+            bumc.progress,
+            bumc.learn_time,
+            bumc.complete_status,
+            bc.cover_url AS curriculum_cover_url,
+            bc.NAME AS curriculum_name,
+            bumc.STATUS
+        FROM
+            bus_user_map_curriculum AS bumc
+            JOIN sys_user AS su ON su.id = bumc.user_id
+            JOIN base_curriculum AS bc ON bc.ID = bumc.curriculum_id
+        <where>
+            <if test="userName != null and userName != ''">
+                AND su.NAME = #{userName}
+            </if>
+            <if test="status != null">
+                AND bumc.status = #{status}
+            </if>
+            <if test="curriculumStatus != null">
+                AND bc.status = #{curriculumStatus}
+            </if>
+            <if test="completeStatus != null">
+                AND bumc.complete_status = #{completeStatus}
+            </if>
+        </where>
+        ORDER BY bc.create_time DESC
+    </select>
+    
+    <!-- 根据课程id查询用户课程列表 -->
+    <select id="selectUserCurriculumByCurriculumId" resultType="String" parameterType="String">
+        SELECT
+            user_id 
+        FROM
+            bus_user_map_curriculum 
+        WHERE
+            curriculum_id = #{id}
+    </select>
+    
+    <!-- 查询统计用户已经学习的统计列表 -->
+    <select id="selectUserLearnedStatList" resultType="com.hg.knowledgebase.module.stat.bean.StatisticsCondition" parameterType="com.hg.knowledgebase.module.stat.bean.StatisticsCondition">
+        SELECT
+            <choose>
+                <!-- 年统计 -->
+                <when test="type == 'year'">
+                    to_char ( learn_time, 'YYYY' ) AS data,
+                </when>
+                <!-- 月、半年、季度统计 -->
+                <when test="type == 'month' or type == 'half_year' or type == 'quarter'">
+                    to_char ( learn_time, 'YYYY-MM' ) AS data, 
+                </when>
+                <!-- 日、周统计 -->
+                <when test="type == 'day' or type == 'week'">
+                    to_char ( learn_time, 'YYYY-MM-DD' ) AS data,
+                </when>
+                <!-- 自定义统计 -->
+                <when test="type == 'custom'">
+                    <choose>
+                        <when test="customType == 1">
+                            to_char ( learn_time, 'YYYY' ) AS data,
+                        </when>
+                        <when test="customType == 2">
+                            to_char ( learn_time, 'YYYY-MM' ) AS data,
+                        </when>
+                        <when test="customType == 3">
+                            to_char ( learn_time, 'YYYY-MM-DD' ) AS data,
+                        </when>
+                    </choose>
+                </when>
+            </choose>
+            count( 1 ) AS count
+        FROM
+            bus_user_map_curriculum
+        <where>
+            status != 0
+            <if test="otherCondition != null">
+                <if test="otherCondition.containsKey('userId') and otherCondition.userId != null and otherCondition.userId != ''">
+                    AND user_id = #{otherCondition.userId}
+                </if>
+                <if test="otherCondition.containsKey('curriculumId') and otherCondition.curriculumId != null and otherCondition.curriculumId != ''">
+                    AND curriculum_id = #{otherCondition.curriculumId}
+                </if>
+                <if test="otherCondition.containsKey('status') and otherCondition.status != null and otherCondition.status != ''">
+                    AND status = #{otherCondition.status}
+                </if>
+            </if>
+            <choose>
+                <!-- 年统计 -->
+                <when test="type == 'year'">
+                    AND to_char(learn_time, 'YYYY') BETWEEN #{beginTime} AND #{endTime}
+                </when>
+                <!-- 月、半年、季度统计 -->
+                <when test="type == 'month' or half_year' or type == 'quarter'">
+                    AND to_char(learn_time, 'YYYY-MM') BETWEEN #{beginTime} AND #{endTime}
+                </when>
+                <!-- 日、周 统计 -->
+                <when test="type == 'day' or type == 'week'">
+                    AND to_char(learn_time, 'YYYY-MM-DD') BETWEEN #{beginTime} AND #{endTime}
+                </when>
+                <!-- 自定义统计 -->
+                <when test="type == 'custom'">
+                    <choose>
+                        <when test="customType == 1">
+                            AND to_char(learn_time, 'YYYY') BETWEEN #{beginTime} AND #{endTime}
+                        </when>
+                        <when test="customType == 2">
+                            AND to_char(learn_time, 'YYYY-MM') BETWEEN #{beginTime} AND #{endTime}
+                        </when>
+                        <when test="customType == 3">
+                            AND to_char(learn_time, 'YYYY-MM-DD') BETWEEN #{beginTime} AND #{endTime}
+                        </when>
+                    </choose>
+                </when>
+            </choose>
+        </where>
+        GROUP BY
+            learn_time
+    </select>
+</mapper>

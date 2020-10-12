@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.hg.knowledgebase.module.log.mapper.SysLogMapper">
+	<!-- 结果用户扩展map -->
+	<resultMap
+		type="com.hg.knowledgebase.module.log.entity.SystemLogVO"
+		id="SystemLogVOMap">
+		<id column="id" property="id" />
+		<result column="coder" property="coder" />
+		<result column="operation_user" property="operationUser" />
+		<result column="operation_user_dept"
+			property="operationUserDept" />
+		<result column="operation_user_ip" property="operationUserIp" />
+		<result column="operation_time" property="operationTime" />
+		<result column="operation_msg" property="operationMsg" />
+
+	</resultMap>
+
+	<!-- 插入日志 -->
+	<insert id="insertSysLog"
+		parameterType="com.hg.knowledgebase.module.log.entity.SystemLogDO">
+		INSERT INTO
+		sys_log(id,coder,operation_user,operation_time,operation_msg,operation_user_dept,operation_user_ip)
+		VALUES (#{id}, #{coder}, #{operationUser}, #{operationTime},
+		#{operationMsg}, #{operationUserDept},
+		#{operationUserIp})
+	</insert>
+
+
+	<!-- 查询日志 -->
+
+	<select id="selectSystemLog" parameterType="String"
+		resultMap="SystemLogVOMap">
+
+
+		SELECT
+		ID,
+		coder,
+		operation_user,
+		operation_time,
+		operation_msg,
+		operation_user_dept,
+		operation_user_ip
+		FROM
+		sys_log
+		WHERE
+		1 = 1
+		<if test="startAt != null">
+			AND operation_time BETWEEN to_timestamp( '${startAt}','yyyy-MM-DD HH24:MI:SS' )
+			AND to_timestamp( '${endAt}', 'yyyy-MM-DD HH24:MI:SS' )
+		</if>
+		<if test="operationType != null">
+			AND operation_msg like '%${operationType}%'
+		</if>
+
+
+
+	</select>
+
+
+
+
+</mapper>

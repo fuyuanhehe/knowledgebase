@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hg.knowledgebase.module.sys.mapper.IDictMapper" >
+    <!--  结果字典扩展map -->
+    <resultMap type="Dict" id="dictMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="coder" property="coder"/>
+        <result column="group_coder" property="groupCoder"/>
+        <result column="group_name" property="groupName"/>
+        <result column="weight" property="weight"/>
+        <result column="introduction" property="introduction"/>
+        <result column="type" property="type"/>
+        <result column="reserve" property="reserve"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    
+    <!--  结果基础字典扩展map -->
+    <resultMap type="Dict" id="baseDictMap">
+        <id column="id" property="id"/>
+        <id column="coder" property="coder"/>
+        <result column="name" property="name"/>
+    </resultMap>
+    
+    <!-- 插入字典 -->
+    <insert id="insertDict" parameterType="Dict">
+        INSERT INTO sys_dict
+        ( name, id, coder, group_coder, group_name, introduction, reserve, weight, create_user)
+        VALUES
+        ( #{name}, #{id}, #{coder}, #{groupCoder}, #{groupName}, #{introduction}, #{reserve}, #{weight}, #{createUser})
+    </insert>
+    
+    <!-- 批量插入字典 -->
+    <insert id="insertBatchDict" parameterType="java.util.List">
+        INSERT INTO sys_dict
+        ( name, id, coder, group_coder, group_name, introduction, reserve, weight, create_user)
+        VALUES
+        <foreach collection="dicts" item="dict" separator="," close=";">
+	        ( #{dict.name}, #{dict.id}, #{dict.coder}, #{dict.groupCoder}, #{dict.groupName}, #{dict.introduction}, #{dict.reserve},
+	         #{dict.weight}, #{dict.createUser})
+        </foreach>
+    </insert>
+    
+    <!-- 根据id删除字典 -->
+    <delete id="deleteDictById" parameterType="String">
+        DELETE 
+        FROM
+            sys_dict 
+        WHERE
+            id = #{id}
+    </delete>
+    
+    <!-- 根据id批量删除字典 -->
+    <delete id="deleteBatchDictById" parameterType="java.util.List">
+        DELETE 
+        FROM
+            sys_dict 
+        WHERE
+            <foreach collection="ids" item="id" separator="or">
+                id = #{id}
+            </foreach>
+    </delete>
+    
+    <!-- 修改字典 -->
+    <update id="updateDict" parameterType="Dict">
+        UPDATE sys_dict 
+        SET
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="coder != null">
+                coder = #{coder},
+            </if>
+            <if test="groupCoder != null">
+                group_coder = #{groupCoder},
+            </if>
+            <if test="groupName != null">
+                group_name = #{groupName},
+            </if>
+            <if test="introduction != null">
+                introduction = #{introduction},
+            </if>
+            <if test="reserve != null">
+                reserve = #{reserve},
+            </if>
+            <if test="weight != null">
+                weight = #{weight},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </trim>
+        WHERE
+            id = #{id}
+    </update>
+
+    <!-- 根据id查询字典 -->
+    <select id="selectDictById" parameterType="String" resultMap="dictMap">
+        SELECT
+            ID,
+            NAME,
+            coder,
+            group_coder,
+            group_name,
+            introduction,
+            reserve,
+            weight,
+            type
+        FROM
+            sys_dict
+        WHERE
+            id = #{id}
+    </select>
+    
+    <!-- 根据字典名查询字典 -->
+    <select id="selectDictByName" parameterType="String" resultMap="baseDictMap">
+        SELECT
+            id
+        FROM
+            sys_dict
+        WHERE
+            name = #{name}
+    </select>
+    
+    <!-- 查询所有字典 -->
+    <select id="selectDictList" parameterType="Dict" resultMap="dictMap">
+        SELECT
+            ID,
+            NAME,
+            group_name,
+            weight,
+            type,
+            create_time
+        FROM
+            sys_dict
+        <where>
+            <if test="groupCoder != null and groupCoder != ''">
+                AND group_coder = #{groupCoder}
+            </if>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="groupName != null and groupName != ''">
+                AND group_name LIKE CONCAT('%',#{groupName},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    
+    <!-- 查询所有基础字典 -->
+    <select id="selectBaseDictList" parameterType="Dict" resultMap="baseDictMap">
+        SELECT
+            id,
+            coder,
+            NAME
+        FROM
+            sys_dict
+        <where>
+            <if test="groupCoder != null">
+                AND group_coder = #{groupCoder}
+            </if>
+            <if test="name != null">
+                AND name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="groupName != null">
+                AND group_name LIKE CONCAT('%',#{groupName},'%')
+            </if>
+            <if test="beginCreateTime != null and endCreateTime != null">
+                AND create_time BETWEEN #{beginCreateTime} AND #{endCreateTime}
+            </if>
+        </where>
+        ORDER BY weight DESC
+    </select>
+</mapper>
